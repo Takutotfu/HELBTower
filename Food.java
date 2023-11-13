@@ -19,7 +19,7 @@ public class Food extends GameElement{
     }
     
     @Override
-    public void triggerAction(SnakeFXGame gameBoard){
+    public void triggerAction(Model gameBoard){
         gameBoard.setScore(gameBoard.getScore()+foodScoreValue);
         gameBoard.generateFood();
     }

@@ -25,7 +25,7 @@ public abstract class GameElement {
     
     public int getPathToImageLen(){return IMAGE_PATHS.length;}
     
-    public abstract void triggerAction(SnakeFXGame gameBoard);
+    public abstract void triggerAction(Model gameBoard);
 }
 
 
