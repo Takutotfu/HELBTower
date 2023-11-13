@@ -1,6 +1,4 @@
-public class Coin extends GameElement {
-    public int counter = 5;
-    
+public class Coin extends GameElement {    
     public Coin(int posX, int posY){
         super(posX, posY, new String[]{"/img/ic_coin.png"});
     }
@@ -8,8 +6,8 @@ public class Coin extends GameElement {
     @Override
     public void triggerAction(Model gameBoard){
 
-        counter--;
-        if (counter == 0){
+        gameBoard.decreaseCoinCounter();
+        if (gameBoard.getCoinCounter() == 0){
             gameBoard.setGameOver();
         }
         setPosX(gameBoard.getVoidX()) ; 
