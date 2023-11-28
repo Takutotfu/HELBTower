@@ -1,0 +1,98 @@
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.event.EventHandler;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+
+public class HelbTowerController {
+    private HelbTowerModel model;
+    private HelbTowerView view;
+    
+    private static final int WIDTH = 800;
+    private static final int HEIGHT = WIDTH;
+    private static final int ROWS = 20;
+    private static final int COLUMNS = ROWS;
+    private static final int SQUARE_SIZE = WIDTH / ROWS;
+    private static final int RIGHT_BORDER = ROWS - 1;
+    private static final int BOTTOM_BORDER = COLUMNS - 1;
+
+    private GraphicsContext gc;
+
+    private int voidX = -2;
+    private int voidY = -2;
+
+    public HelbTowerController(Stage primaryStage) {
+        model = new HelbTowerModel(ROWS, COLUMNS);
+        view = new HelbTowerView(WIDTH, HEIGHT, ROWS, COLUMNS, SQUARE_SIZE);
+        start(primaryStage);
+    }
+
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("HELBTower");
+        Group root = new Group();
+        Canvas canvas = new Canvas(WIDTH, HEIGHT);
+        root.getChildren().add(canvas);
+        Scene scene = new Scene(root);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+        gc = canvas.getGraphicsContext2D();
+
+        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                KeyCode code = event.getCode();
+                if (code == KeyCode.RIGHT || code == KeyCode.D) {
+                    if (model.getCharHead().getX() < RIGHT_BORDER) {
+                        model.moveRight();
+                    }
+                } else if (code == KeyCode.LEFT || code == KeyCode.A) {
+                    if (model.getCharHead().getX() > 0) {
+                        model.moveLeft();
+                    }
+                } else if (code == KeyCode.UP || code == KeyCode.W) {
+                    if (model.getCharHead().getY() > 0) {
+                        model.moveUp();
+                    }
+                } else if (code == KeyCode.DOWN || code == KeyCode.S) {
+                    if (model.getCharHead().getY() < BOTTOM_BORDER) {
+                        model.moveDown();
+                    }
+                }
+                System.out.println(model.getCharHead().getX() + " || " + model.getCharHead().getY()); // DEBUG POSITION
+            }
+        });
+
+        model.generateFood();
+        
+        for (int i = 0; i < model.getCoinCounter(); i++) {
+            model.generateCoin();
+        }
+
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(130), e -> run(gc)));
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+    }
+
+    private void run(GraphicsContext gc) {
+        if (model.getGameOver()) {
+            view.gameOver(gc);
+            return;
+        }
+        view.drawBackground(gc);
+        view.drawChar(model.getCharHead(), gc);
+        view.drawScore(model.getScore(), gc);
+        
+        view.drawGameElements(model.getGameElementList(), model.getImageMap(), gc);
+
+        //gameOver();
+        model.eatFood();
+        model.eatCoin();
+    }
+}

@@ -1,11 +1,12 @@
-public class Coin extends GameElement {    
+public class Coin extends GameElement {
+    
     public Coin(int posX, int posY){
         super(posX, posY, new String[]{"/img/ic_coin.png"});
     }
-
+    
     @Override
-    public void triggerAction(Model gameBoard){
-
+    public void triggerAction(HelbTowerModel gameBoard){
+    
         gameBoard.decreaseCoinCounter();
         if (gameBoard.getCoinCounter() == 0){
             gameBoard.setGameOver();
@@ -14,8 +15,3 @@ public class Coin extends GameElement {
         setPosY(gameBoard.getVoidY()) ;
     }
 }
-
-
-
-
-

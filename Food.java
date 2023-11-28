@@ -5,7 +5,7 @@ public class Food extends GameElement{
     
     public Food(int posX, int posY) {
         super(posX, posY, new String[]{"/img/ic_orange.png", 
-                       "/img/ic_apple.png"});
+                                       "/img/ic_apple.png"});
     }
     
     public void setFoodImage(){
@@ -19,14 +19,8 @@ public class Food extends GameElement{
     }
     
     @Override
-    public void triggerAction(Model gameBoard){
+    public void triggerAction(HelbTowerModel gameBoard){
         gameBoard.setScore(gameBoard.getScore()+foodScoreValue);
         gameBoard.generateFood();
     }
 }
-
-
-
-
-
-
