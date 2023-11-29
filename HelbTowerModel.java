@@ -8,6 +8,8 @@ import javafx.scene.image.Image;
 public class HelbTowerModel {
     private int rows;
     private int columns;
+    private int spawnRows;
+    private int spawnColumns;
     private int voidX = -2;
     private int voidY = -2;
 
@@ -16,7 +18,7 @@ public class HelbTowerModel {
     private Point charHead = new Point(5,2);
 
     private int score;
-    private int coinCounter = 5;
+    private int coinCounter = 200;
     private Food food = new Food(voidX, voidY);
 
     private String foodClassDescriptionString = food.getClass().getName();
@@ -35,13 +37,17 @@ public class HelbTowerModel {
 
         this.rows = rows;
         this.columns = columns;
+        // spawn area
+        spawnRows = rows - 1;
+        spawnColumns = columns - 1;
     }
 
     public void generateFood() {
         start:
         while (true) {
-            int randomXPos = (int) (Math.random() * rows);
-            int randomYPos = (int) (Math.random() * columns);
+            // 1 -> spawnRows/spawnColumns
+            int randomXPos = (int) (Math.random() * spawnRows + 1);
+            int randomYPos = (int) (Math.random() * spawnColumns + 1);
 
             if (charHead.getX() == randomXPos 
                 && charHead.getY() == randomYPos) {
@@ -72,8 +78,9 @@ public class HelbTowerModel {
     public void generateCoin() {
         start:
         while (true) {
-            int randomXPos = (int) (Math.random() * rows);
-            int randomYPos = (int) (Math.random() * columns);
+            // 1 -> spawnRows/spawnColumns
+            int randomXPos = (int) (Math.random() * spawnRows + 1);
+            int randomYPos = (int) (Math.random() * spawnColumns + 1);
 
             if (charHead.getX() == randomXPos
                     && charHead.getY() == randomYPos) {

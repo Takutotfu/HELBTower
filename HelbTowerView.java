@@ -32,7 +32,9 @@ public class HelbTowerView {
     public void drawBackground(GraphicsContext gc) {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                if ((i + j) % 2 == 0) {
+                if (i == 0 || j == 0 || i == rows - 1 || j == columns - 1) {
+                    gc.setFill(Color.web("#935900")); // borders
+                } else if ((i + j) % 2 == 0) {
                     gc.setFill(Color.web("ffffff"));
                 } else {
                     gc.setFill(Color.web("f1f1f1"));
