@@ -8,18 +8,25 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 public class HelbTowerView {
-    private int width;
-    private int height;
-    private int rows;
-    private int columns;
-    private int squareSize;
+    private int width, height, rows, columns, squareSize;
+    private int right, left, down, up;
 
-    public HelbTowerView(int width, int height, int rows, int columns, int squareSize) {
+    private Image charSkinDown = new Image("img/characterDown.png");
+    private Image charSkinUp = new Image("img/characterUp.png");
+    private Image charSkinRight = new Image("img/characterRight.png");
+    private Image charSkinLeft = new Image("img/characterLeft.png");
+
+    public HelbTowerView(int width, int height, int rows, int columns, int squareSize, 
+                         int right, int left, int down, int up) {
         this.width = width;
         this.height = height;
         this.rows = rows;
         this.columns = columns;
         this.squareSize = squareSize;
+        this.right = right;
+        this.left = left;
+        this.down = down;
+        this.up = up;
     }
 
     public void gameOver(GraphicsContext gc) {
@@ -48,15 +55,31 @@ public class HelbTowerView {
         }
     }
 
-    public void drawChar(Point charHead, GraphicsContext gc) {
-        gc.setFill(Color.web("ff8800"));
-        gc.fillRoundRect(charHead.getX() * squareSize, charHead.getY() * squareSize, squareSize - 1, squareSize - 1, 35, 35);
+    public void drawChar(Point charHead, int currentDirection, GraphicsContext gc) {
+        Image currentSkin = charSkinDown;
+        
+        if (currentDirection == down) {
+            currentSkin = charSkinDown;
+        } else if (currentDirection == up) {
+            currentSkin = charSkinUp;
+        } else if (currentDirection == right) {
+            currentSkin = charSkinRight;
+        } else if (currentDirection == left) {
+            currentSkin = charSkinLeft;
+        }
+
+        gc.drawImage(currentSkin, 
+                     charHead.getX() * squareSize, 
+                     charHead.getY() * squareSize, 
+                     squareSize, 
+                     squareSize);
     }
 
-    public void drawScore(int score, GraphicsContext gc) {
+    public void drawScore(int score, int coinCounter, GraphicsContext gc) {
         gc.setFill(Color.BLACK);
         gc.setFont(new Font("Digital-7", 35));
         gc.fillText("Score: " + score, 10, 35);
+        gc.fillText("Coin: " + coinCounter, width - 150, 35);
     }
 
     public void drawGameElements(ArrayList<GameElement> gameElementList, Map<String, Image> imageMap, GraphicsContext gc) {

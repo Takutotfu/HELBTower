@@ -6,8 +6,6 @@ import java.util.Map;
 import javafx.scene.image.Image;
 
 public class HelbTowerModel {
-    private int rows;
-    private int columns;
     private int spawnRows;
     private int spawnColumns;
     private int voidX = -2;
@@ -18,7 +16,7 @@ public class HelbTowerModel {
     private Point charHead = new Point(5,2);
 
     private int score;
-    private int coinCounter = 200;
+    private int coinCounter;
     private Food food = new Food(voidX, voidY);
 
     private String foodClassDescriptionString = food.getClass().getName();
@@ -35,11 +33,11 @@ public class HelbTowerModel {
         imageMap.put(foodClassDescriptionString, foodImage);
         imageMap.put(coinClassDescriptionString, coinImage);
 
-        this.rows = rows;
-        this.columns = columns;
         // spawn area
-        spawnRows = rows - 1;
-        spawnColumns = columns - 1;
+        spawnRows = rows - 2;
+        spawnColumns = columns - 2;
+
+        coinCounter = (rows-2) * (columns-2) - 2;
     }
 
     public void generateFood() {

@@ -16,22 +16,26 @@ public class HelbTowerController {
     private HelbTowerView view;
     private Teleporter teleporter;
     
-    private static final int WIDTH = 825;
-    private static final int HEIGHT = 650;
-    private static final int ROWS = 25;
-    private static final int COLUMNS = 20;
+    private static final int WIDTH = 800;
+    private static final int HEIGHT = 600;
+    private static final int ROWS = 20;
+    private static final int COLUMNS = 15;
     private static final int SQUARE_SIZE = WIDTH / ROWS;
     private static final int RIGHT_BORDER = ROWS - 2;
     private static final int BOTTOM_BORDER = COLUMNS - 2;
 
     private GraphicsContext gc;
 
-    private int voidX = -2;
-    private int voidY = -2;
+    private int currentDirection;
+
+    private static final int RIGHT = 0;
+    private static final int LEFT = 1;
+    private static final int DOWN = 2;
+    private static final int UP = 3;
 
     public HelbTowerController(Stage primaryStage) {
-        model = new HelbTowerModel(ROWS-1, COLUMNS-1);
-        view = new HelbTowerView(WIDTH, HEIGHT, ROWS, COLUMNS, SQUARE_SIZE);
+        model = new HelbTowerModel(ROWS, COLUMNS);
+        view = new HelbTowerView(WIDTH, HEIGHT, ROWS, COLUMNS, SQUARE_SIZE, RIGHT, LEFT, DOWN, UP);
         teleporter = new Teleporter((int)ROWS/2, (int)COLUMNS/2, model.getCharHead());
         start(primaryStage);
     }
@@ -53,18 +57,22 @@ public class HelbTowerController {
                 if (code == KeyCode.RIGHT || code == KeyCode.D) {
                     if (model.getCharHead().getX() < RIGHT_BORDER || model.getCharHead().getY() == teleporter.getY()) {
                         model.moveRight();
+                        currentDirection = RIGHT;
                     }
                 } else if (code == KeyCode.LEFT || code == KeyCode.A) {
                     if (model.getCharHead().getX() > 1 || model.getCharHead().getY() == teleporter.getY()) {
                         model.moveLeft();
+                        currentDirection = LEFT;
                     }
                 } else if (code == KeyCode.UP || code == KeyCode.W) {
                     if (model.getCharHead().getY() > 1|| model.getCharHead().getX() == teleporter.getX() ) {
                         model.moveUp();
+                        currentDirection = UP;
                     }
                 } else if (code == KeyCode.DOWN || code == KeyCode.S) {
                     if (model.getCharHead().getY() < BOTTOM_BORDER || model.getCharHead().getX() == teleporter.getX()) {
                         model.moveDown();
+                        currentDirection = DOWN;
                     }
                 }
                 System.out.println("x:" + model.getCharHead().getX() + " ; y:" + model.getCharHead().getY()); // DEBUG POSITION
@@ -88,10 +96,11 @@ public class HelbTowerController {
             return;
         }
         view.drawBackground(gc, teleporter.getX(), teleporter.getY());
-        view.drawChar(model.getCharHead(), gc);
-        view.drawScore(model.getScore(), gc);
-        
         view.drawGameElements(model.getGameElementList(), model.getImageMap(), gc);
+        
+        view.drawChar(model.getCharHead(), currentDirection, gc);
+        view.drawScore(model.getScore(), model.getCoinCounter(), gc);
+        
 
         //gameOver();
         model.eatFood();
