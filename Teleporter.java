@@ -12,15 +12,14 @@ public class Teleporter {
     }
 
     public void portal(int rightBorder, int bottomBorder) {
-        System.out.println(posX);
         if (charHead.getX() < 1) {
-            charHead.setLocation(rightBorder, charHead.getY());
+            charHead.setLocation(rightBorder, posY);
         } else if (charHead.getX() > rightBorder) {
-            charHead.setLocation(1, charHead.getY());
+            charHead.setLocation(1, posY);
         } else if (charHead.getY() < 1) {
-            charHead.setLocation(bottomBorder, charHead.getX());
+            charHead.setLocation(posX, bottomBorder);
         } else if (charHead.getY() > bottomBorder) {
-            charHead.setLocation(1, charHead.getX());
+            charHead.setLocation(posX, 1);
         }
     }
 

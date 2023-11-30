@@ -51,15 +51,15 @@ public class HelbTowerController {
             public void handle(KeyEvent event) {
                 KeyCode code = event.getCode();
                 if (code == KeyCode.RIGHT || code == KeyCode.D) {
-                    if (model.getCharHead().getX() < RIGHT_BORDER) {
+                    if (model.getCharHead().getX() < RIGHT_BORDER || model.getCharHead().getY() == teleporter.getY()) {
                         model.moveRight();
                     }
                 } else if (code == KeyCode.LEFT || code == KeyCode.A) {
-                    if (model.getCharHead().getX() > 1) {
+                    if (model.getCharHead().getX() > 1 || model.getCharHead().getY() == teleporter.getY()) {
                         model.moveLeft();
                     }
                 } else if (code == KeyCode.UP || code == KeyCode.W) {
-                    if (model.getCharHead().getY() > 1) {
+                    if (model.getCharHead().getY() > 1|| model.getCharHead().getX() == teleporter.getX() ) {
                         model.moveUp();
                     }
                 } else if (code == KeyCode.DOWN || code == KeyCode.S) {
@@ -87,7 +87,7 @@ public class HelbTowerController {
             view.gameOver(gc);
             return;
         }
-        view.drawBackground(gc);
+        view.drawBackground(gc, teleporter.getX(), teleporter.getY());
         view.drawChar(model.getCharHead(), gc);
         view.drawScore(model.getScore(), gc);
         

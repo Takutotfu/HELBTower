@@ -29,10 +29,14 @@ public class HelbTowerView {
         return;
     }
 
-    public void drawBackground(GraphicsContext gc) {
+    public void drawBackground(GraphicsContext gc, int tpX, int tpY) {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                if (i == 0 || j == 0 || i == rows - 1 || j == columns - 1) {
+                if ((i == tpX && j == 0) || (i == tpX && j == columns - 1)) { // teleporters
+                    gc.setFill(Color.web("2277ea"));
+                } else if ((i == 0 && j == tpY) || (i == rows - 1 && j == tpY)) {
+                    gc.setFill(Color.web("ea2522"));
+                } else if (i == 0 || j == 0 || i == rows - 1 || j == columns - 1) {
                     gc.setFill(Color.web("#935900")); // borders
                 } else if ((i + j) % 2 == 0) {
                     gc.setFill(Color.web("ffffff"));
