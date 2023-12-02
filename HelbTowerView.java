@@ -1,5 +1,6 @@
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import javafx.scene.canvas.GraphicsContext;
@@ -16,6 +17,8 @@ public class HelbTowerView {
     private Image charSkinRight = new Image("img/characterRight.png");
     private Image charSkinLeft = new Image("img/characterLeft.png");
 
+    
+
     public HelbTowerView(int width, int height, int rows, int columns, int squareSize, 
                          int right, int left, int down, int up) {
         this.width = width;
@@ -29,23 +32,17 @@ public class HelbTowerView {
         this.up = up;
     }
 
-    public void gameOver(GraphicsContext gc) {
-        gc.setFill(Color.RED);
+    public void drawGameOver(GraphicsContext gc) {
+        gc.setFill(Color.GREEN);
         gc.setFont(new Font("Digital-7", 70));
-        gc.fillText("Game Over", width / 3.5, height / 2);
+        gc.fillText("GG you win !", width / 4, height / 2);
         return;
     }
 
-    public void drawBackground(GraphicsContext gc, int tpX, int tpY) {
+    public void drawBackground(GraphicsContext gc) {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                if ((i == tpX && j == 0) || (i == tpX && j == columns - 1)) { // teleporters
-                    gc.setFill(Color.web("2277ea"));
-                } else if ((i == 0 && j == tpY) || (i == rows - 1 && j == tpY)) {
-                    gc.setFill(Color.web("ea2522"));
-                } else if (i == 0 || j == 0 || i == rows - 1 || j == columns - 1) {
-                    gc.setFill(Color.web("#935900")); // borders
-                } else if ((i + j) % 2 == 0) {
+                if ((i + j) % 2 == 0) {
                     gc.setFill(Color.web("ffffff"));
                 } else {
                     gc.setFill(Color.web("f1f1f1"));
@@ -53,6 +50,43 @@ public class HelbTowerView {
                 gc.fillRect(i * squareSize, j * squareSize, squareSize, squareSize);
             }
         }
+    }
+
+    public void drawWall(ArrayList<Point> walls, String pathToImg, GraphicsContext gc) {
+        Image wallSkin = new Image(pathToImg);
+        for (Point wall : walls) {
+            gc.drawImage(wallSkin, 
+                         wall.getX() * squareSize, 
+                         wall.getY() * squareSize, 
+                         squareSize, 
+                         squareSize);
+        }
+    }
+
+    public void drawTelporter(HashMap<String, Point> teleporters, String redSkinPath, String blueSkinPath, GraphicsContext gc) {
+        Image redSkin = new Image(redSkinPath);
+        Image blueSkin = new Image(blueSkinPath);
+
+        gc.drawImage(blueSkin, 
+                     teleporters.get("portalTop").getX() * squareSize, 
+                     teleporters.get("portalTop").getY() * squareSize, 
+                     squareSize, 
+                     squareSize);
+        gc.drawImage(blueSkin, 
+                     teleporters.get("portalDown").getX() * squareSize, 
+                     teleporters.get("portalDown").getY() * squareSize, 
+                     squareSize, 
+                     squareSize);
+        gc.drawImage(redSkin, 
+                     teleporters.get("portalLeft").getX() * squareSize, 
+                     teleporters.get("portalLeft").getY() * squareSize, 
+                     squareSize, 
+                     squareSize);
+        gc.drawImage(redSkin, 
+                     teleporters.get("portalRight").getX() * squareSize, 
+                     teleporters.get("portalRight").getY() * squareSize, 
+                     squareSize, 
+                     squareSize);
     }
 
     public void drawChar(Point charHead, int currentDirection, GraphicsContext gc) {
@@ -82,9 +116,10 @@ public class HelbTowerView {
         gc.fillText("Coin: " + coinCounter, width - 150, 35);
     }
 
-    public void drawGameElements(ArrayList<GameElement> gameElementList, Map<String, Image> imageMap, GraphicsContext gc) {
+    public void drawGameElements(ArrayList<GameElement> gameElementList, Map<String, String> pathToImageMap, GraphicsContext gc) {
         for (GameElement gameElem : gameElementList) {
-            gc.drawImage(imageMap.get(gameElem.getClass().getName()), 
+            Image currentImage = new Image(pathToImageMap.get(gameElem.getClass().getName()));
+            gc.drawImage(currentImage, 
                          gameElem.getPosX() * squareSize, 
                          gameElem.getPosY() * squareSize, 
                          squareSize, 

@@ -3,8 +3,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import javafx.scene.image.Image;
-
 public class HelbTowerModel {
     private int spawnRows;
     private int spawnColumns;
@@ -21,17 +19,18 @@ public class HelbTowerModel {
 
     private String foodClassDescriptionString = food.getClass().getName();
     private String coinClassDescriptionString = new Coin(voidX,voidY).getClass().getName();
-    private Image foodImage = new Image(food.getPathToImage());
-    private Image coinImage = new Image(new Coin(voidX,voidY).getPathToImage());
+    
+    private String pathToFoodImage = food.getPathToImage();
+    private String pathToCoinImage = new Coin(voidX,voidY).getPathToImage();
 
     private ArrayList<Coin> coinList = new ArrayList<Coin>();
     private ArrayList<GameElement> gameElementList = new ArrayList<GameElement>();
-    private Map<String, Image> imageMap = new HashMap<>();
+    private Map<String, String> pathToImageMap = new HashMap<>();
 
     public HelbTowerModel(int rows, int columns) {
         gameElementList.add(food);
-        imageMap.put(foodClassDescriptionString, foodImage);
-        imageMap.put(coinClassDescriptionString, coinImage);
+        pathToImageMap.put(foodClassDescriptionString, pathToFoodImage);
+        pathToImageMap.put(coinClassDescriptionString, pathToCoinImage);
 
         // spawn area
         spawnRows = rows - 2;
@@ -67,8 +66,8 @@ public class HelbTowerModel {
             food.setPosX(randomXPos);
             food.setPosY(randomYPos);
             food.setFoodImage();
-            foodImage = new Image(food.getPathToImage());
-            imageMap.put(foodClassDescriptionString, foodImage);
+            pathToFoodImage = food.getPathToImage();
+            pathToImageMap.put(foodClassDescriptionString, pathToFoodImage);
             break;
         }
     }
@@ -158,8 +157,8 @@ public class HelbTowerModel {
         return charHead;
     }
 
-    public Map<String, Image> getImageMap() {
-        return imageMap;
+    public Map<String, String> getPathToImageMap() {
+        return pathToImageMap;
     }
 
     public ArrayList<GameElement> getGameElementList() {
