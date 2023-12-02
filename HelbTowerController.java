@@ -84,12 +84,14 @@ public class HelbTowerController {
         for (int i = 0; i < model.getCoinCounter(); i++) {
             model.generateCoin();
         }
-
+        
+        //wall.generateRandomWall();
+        
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(130), e -> run(gc)));
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
     }
-
+    
     private void run(GraphicsContext gc) {
         if (model.getGameOver()) {
             view.drawGameOver(gc);
@@ -98,8 +100,8 @@ public class HelbTowerController {
         view.drawBackground(gc);
         view.drawWall(wall.getWallArrayList(), wall.getPathToImg(), gc);
         view.drawTelporter(teleporter.getPortalHashMap(), 
-                           teleporter.getPathToImages("red"), 
-                           teleporter.getPathToImages("blue"), 
+        teleporter.getPathToImages("red"), 
+        teleporter.getPathToImages("blue"), 
                            gc);
         view.drawGameElements(model.getGameElementList(), model.getPathToImageMap(), gc);
         

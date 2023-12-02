@@ -17,7 +17,8 @@ public class HelbTowerView {
     private Image charSkinRight = new Image("img/characterRight.png");
     private Image charSkinLeft = new Image("img/characterLeft.png");
 
-    
+    private Image grassTexture = new Image("img/grass.png");
+    private Image grass2Texture = new Image("img/grass2.png");
 
     public HelbTowerView(int width, int height, int rows, int columns, int squareSize, 
                          int right, int left, int down, int up) {
@@ -33,21 +34,23 @@ public class HelbTowerView {
     }
 
     public void drawGameOver(GraphicsContext gc) {
-        gc.setFill(Color.GREEN);
+        gc.setFill(Color.BLACK);
         gc.setFont(new Font("Digital-7", 70));
         gc.fillText("GG you win !", width / 4, height / 2);
         return;
     }
 
     public void drawBackground(GraphicsContext gc) {
+        Image currentImage;
+
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 if ((i + j) % 2 == 0) {
-                    gc.setFill(Color.web("ffffff"));
+                    currentImage = grassTexture;
                 } else {
-                    gc.setFill(Color.web("f1f1f1"));
+                    currentImage = grass2Texture;
                 }
-                gc.fillRect(i * squareSize, j * squareSize, squareSize, squareSize);
+                gc.drawImage(currentImage, i * squareSize, j * squareSize, squareSize, squareSize);
             }
         }
     }

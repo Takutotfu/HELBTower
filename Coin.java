@@ -1,7 +1,7 @@
 public class Coin extends GameElement {
     
     public Coin(int posX, int posY){
-        super(posX, posY, new String[]{"/img/ic_coin.png"});
+        super(posX, posY, new String[]{"/img/coin.png"});
     }
     
     @Override

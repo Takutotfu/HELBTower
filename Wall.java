@@ -36,6 +36,13 @@ public class Wall {
         wallArrayList.add(new Point(rows-1,columns-1));
     }
 
+    public void generateRandomWall() {
+        int posX = (int) (Math.random() * rows + 1);
+        int posY = (int) (Math.random() * columns + 1);
+
+        wallArrayList.add(new Point(posX, posY));
+    }
+
     public boolean isNextCaseIsAWall(Point charHead, int direction) {
         for (Point wall : wallArrayList) {
             if ((charHead.getX() - 1 == wall.getX() && charHead.getY() == wall.getY() && direction == 1) ||  // left direction
