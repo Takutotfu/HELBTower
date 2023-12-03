@@ -19,7 +19,7 @@ public class Food extends GameElement{
     }
     
     @Override
-    public void triggerAction(HelbTowerModel gameBoard){
+    public void triggerAction(HelbTowerModel gameBoard) {
         gameBoard.setScore(gameBoard.getScore()+foodScoreValue);
         gameBoard.generateFood();
     }

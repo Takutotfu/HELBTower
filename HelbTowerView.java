@@ -12,13 +12,13 @@ public class HelbTowerView {
     private int width, height, rows, columns, squareSize;
     private int right, left, down, up;
 
-    private Image charSkinDown = new Image("img/characterDown.png");
-    private Image charSkinUp = new Image("img/characterUp.png");
-    private Image charSkinRight = new Image("img/characterRight.png");
-    private Image charSkinLeft = new Image("img/characterLeft.png");
-
     private Image grassTexture = new Image("img/grass.png");
     private Image grass2Texture = new Image("img/grass2.png");
+
+    private Image wallSkin;
+    private Image tpSkinBlue, tpSkinRed;
+    private Image charSkinDown, charSkinUp, charSkinLeft, charSkinRight;
+    private Map<String, Image> gameElemImgMap = new HashMap<>();
 
     public HelbTowerView(int width, int height, int rows, int columns, int squareSize, 
                          int right, int left, int down, int up) {
@@ -33,8 +33,29 @@ public class HelbTowerView {
         this.up = up;
     }
 
+    public void convertPathToImage(ArrayList<GameElement> gameElementList, 
+                                   Map<String, String> pathTogameElemImgMap, 
+                                   Map<String, String> pathToCharSkin, 
+                                   String pathToWallSkin, 
+                                   String[] pathToTpSkins) {
+
+        for (GameElement gameElem : gameElementList) {
+            gameElemImgMap.put(gameElem.getClass().getName(), new Image(pathTogameElemImgMap.get(gameElem.getClass().getName())));
+        }
+
+        charSkinDown = new Image(pathToCharSkin.get("charcterDown"));
+        charSkinUp = new Image(pathToCharSkin.get("charcterUp"));
+        charSkinLeft = new Image(pathToCharSkin.get("charcterLeft"));
+        charSkinRight = new Image(pathToCharSkin.get("charcterRight"));
+
+        wallSkin = new Image(pathToWallSkin);
+
+        tpSkinBlue = new Image(pathToTpSkins[0]);
+        tpSkinRed = new Image(pathToTpSkins[1]);
+    }
+
     public void drawGameOver(GraphicsContext gc) {
-        gc.setFill(Color.BLACK);
+        gc.setFill(Color.WHITE);
         gc.setFont(new Font("Digital-7", 70));
         gc.fillText("GG you win !", width / 4, height / 2);
         return;
@@ -55,8 +76,7 @@ public class HelbTowerView {
         }
     }
 
-    public void drawWall(ArrayList<Point> walls, String pathToImg, GraphicsContext gc) {
-        Image wallSkin = new Image(pathToImg);
+    public void drawWall(ArrayList<Point> walls, GraphicsContext gc) {
         for (Point wall : walls) {
             gc.drawImage(wallSkin, 
                          wall.getX() * squareSize, 
@@ -66,26 +86,23 @@ public class HelbTowerView {
         }
     }
 
-    public void drawTelporter(HashMap<String, Point> teleporters, String redSkinPath, String blueSkinPath, GraphicsContext gc) {
-        Image redSkin = new Image(redSkinPath);
-        Image blueSkin = new Image(blueSkinPath);
-
-        gc.drawImage(blueSkin, 
+    public void drawTelporter(HashMap<String, Point> teleporters, GraphicsContext gc) {
+        gc.drawImage(tpSkinBlue, 
                      teleporters.get("portalTop").getX() * squareSize, 
                      teleporters.get("portalTop").getY() * squareSize, 
                      squareSize, 
                      squareSize);
-        gc.drawImage(blueSkin, 
+        gc.drawImage(tpSkinBlue, 
                      teleporters.get("portalDown").getX() * squareSize, 
                      teleporters.get("portalDown").getY() * squareSize, 
                      squareSize, 
                      squareSize);
-        gc.drawImage(redSkin, 
+        gc.drawImage(tpSkinRed, 
                      teleporters.get("portalLeft").getX() * squareSize, 
                      teleporters.get("portalLeft").getY() * squareSize, 
                      squareSize, 
                      squareSize);
-        gc.drawImage(redSkin, 
+        gc.drawImage(tpSkinRed, 
                      teleporters.get("portalRight").getX() * squareSize, 
                      teleporters.get("portalRight").getY() * squareSize, 
                      squareSize, 
@@ -113,16 +130,15 @@ public class HelbTowerView {
     }
 
     public void drawScore(int score, int coinCounter, GraphicsContext gc) {
-        gc.setFill(Color.BLACK);
-        gc.setFont(new Font("Digital-7", 35));
-        gc.fillText("Score: " + score, 10, 35);
-        gc.fillText("Coin: " + coinCounter, width - 150, 35);
+        gc.setFill(Color.YELLOW);
+        gc.setFont(new Font("IMPACT", 20));
+        gc.fillText("Score: " + score, 10, 20);
+        gc.fillText("Coin: " + coinCounter, width - 100, 20);
     }
 
-    public void drawGameElements(ArrayList<GameElement> gameElementList, Map<String, String> pathToImageMap, GraphicsContext gc) {
+    public void drawGameElements(ArrayList<GameElement> gameElementList, GraphicsContext gc) {
         for (GameElement gameElem : gameElementList) {
-            Image currentImage = new Image(pathToImageMap.get(gameElem.getClass().getName()));
-            gc.drawImage(currentImage, 
+            gc.drawImage(gameElemImgMap.get(gameElem.getClass().getName()), 
                          gameElem.getPosX() * squareSize, 
                          gameElem.getPosY() * squareSize, 
                          squareSize, 

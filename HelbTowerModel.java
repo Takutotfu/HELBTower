@@ -11,10 +11,10 @@ public class HelbTowerModel {
 
     private boolean gameOver;
 
-    private Point charHead = new Point(5,2);
+    private Point mainChar;
 
     private int score;
-    private int coinCounter;
+    private int coinCounter = 0;
     private Food food = new Food(voidX, voidY);
 
     private String foodClassDescriptionString = food.getClass().getName();
@@ -25,18 +25,22 @@ public class HelbTowerModel {
 
     private ArrayList<Coin> coinList = new ArrayList<Coin>();
     private ArrayList<GameElement> gameElementList = new ArrayList<GameElement>();
+    private ArrayList<Point> gameElementsPoints;
     private Map<String, String> pathToImageMap = new HashMap<>();
 
-    public HelbTowerModel(int rows, int columns) {
+    public HelbTowerModel(int rows, int columns, Point mainChar, ArrayList<Point> gameElementsPoints) {
+        this.mainChar = mainChar;
+        this.gameElementsPoints = gameElementsPoints;
+
         gameElementList.add(food);
+        gameElementsPoints.add(new Point(food.getPosX(), food.getPosY()));
+
         pathToImageMap.put(foodClassDescriptionString, pathToFoodImage);
         pathToImageMap.put(coinClassDescriptionString, pathToCoinImage);
 
         // spawn area
         spawnRows = rows - 2;
         spawnColumns = columns - 2;
-
-        coinCounter = (rows-2) * (columns-2) - 2;
     }
 
     public void generateFood() {
@@ -46,21 +50,11 @@ public class HelbTowerModel {
             int randomXPos = (int) (Math.random() * spawnRows + 1);
             int randomYPos = (int) (Math.random() * spawnColumns + 1);
 
-            if (charHead.getX() == randomXPos 
-                && charHead.getY() == randomYPos) {
-                continue start;
-            }
-
-            for (Coin otherCoin : coinList) {
-                if (otherCoin.getPosX() == randomXPos 
-                && otherCoin.getPosY() == randomYPos) {
+            for (Point gameElementPoint : gameElementsPoints) {
+                if (gameElementPoint.getX() == randomXPos 
+                        && gameElementPoint.getY() == randomYPos) {
                     continue start;
                 }
-            }
-            
-            if (food.getPosX() == randomXPos 
-                && food.getPosY() == randomYPos) {
-                    continue start;
             }
             
             food.setPosX(randomXPos);
@@ -68,6 +62,7 @@ public class HelbTowerModel {
             food.setFoodImage();
             pathToFoodImage = food.getPathToImage();
             pathToImageMap.put(foodClassDescriptionString, pathToFoodImage);
+            gameElementsPoints.add(new Point(randomXPos, randomYPos));
             break;
         }
     }
@@ -79,47 +74,62 @@ public class HelbTowerModel {
             int randomXPos = (int) (Math.random() * spawnRows + 1);
             int randomYPos = (int) (Math.random() * spawnColumns + 1);
 
-            if (charHead.getX() == randomXPos
-                    && charHead.getY() == randomYPos) {
-                continue start;
-            }
-
-            for (Coin otherCoin : coinList) {
-                if (otherCoin.getPosX() == randomXPos 
-                        && otherCoin.getPosY() == randomYPos) {
+            for (Point gameElementPoint : gameElementsPoints) {
+                if (gameElementPoint.getX() == randomXPos 
+                        && gameElementPoint.getY() == randomYPos) {
                     continue start;
                 }
-            }
-            
-            if (food.getPosX() == randomXPos 
-                    && food.getPosY() == randomYPos) {
-                continue start;
             }
             
             Coin newCoin = new Coin(randomXPos, randomYPos);
             coinList.add(newCoin);
             gameElementList.add(newCoin);
+            gameElementsPoints.add(new Point(randomXPos, randomYPos));
+            coinCounter++;
             break;
         }
     }
 
     public void eatFood() {
-        if (charHead.getX() == food.getPosX() 
-        && charHead.getY() == food.getPosY()) {
+        int cpt = 0;
+
+        if (mainChar.getX() == food.getPosX() && mainChar.getY() == food.getPosY()) {
+
+            while (!(cpt == gameElementsPoints.size() - 1 || gameElementsPoints.get(cpt).getX() == food.getPosX() &&
+                                                             gameElementsPoints.get(cpt).getY() == food.getPosY())) {
+                cpt++;
+            }
+            
+            if (gameElementsPoints.get(cpt).getX() == food.getPosX() &&
+                    gameElementsPoints.get(cpt).getY() == food.getPosY()) {                
+                gameElementsPoints.remove(cpt);
+            }
+
             food.triggerAction(this);
         }
     }
     
     public void eatCoin() {
+        int cpt = 0;
+
         for (Coin coin : coinList) {
-            if (charHead.getX() == coin.getPosX() 
-            && charHead.getY() == coin.getPosY()) {
+            if (mainChar.getX() == coin.getPosX() && mainChar.getY() == coin.getPosY()) {
+
+                while (!(cpt == gameElementsPoints.size() - 1 || gameElementsPoints.get(cpt).getX() == coin.getPosX() &&
+                                                                 gameElementsPoints.get(cpt).getY() == coin.getPosY())) {
+                    cpt++;
+                }
+
+                if (gameElementsPoints.get(cpt).getX() == coin.getPosX() &&
+                        gameElementsPoints.get(cpt).getY() == coin.getPosY()) {
+                    gameElementsPoints.remove(cpt);
+                }
+
                 coin.triggerAction(this);
             }
         }
     }
     
-
     // GET & SET
     public int getScore(){
         return score;
@@ -153,10 +163,6 @@ public class HelbTowerModel {
         return voidY;
     }
 
-    public Point getCharHead() {
-        return charHead;
-    }
-
     public Map<String, String> getPathToImageMap() {
         return pathToImageMap;
     }
@@ -164,23 +170,5 @@ public class HelbTowerModel {
     public ArrayList<GameElement> getGameElementList() {
         return gameElementList;
     }
-
-    // DEPLACEMENTS
-    public void moveRight() {
-        charHead.x++;
-    }
-
-    public void moveLeft() {
-        charHead.x--;
-    }
-
-    public void moveUp() {
-        charHead.y--;
-    }
-
-    public void moveDown() {
-        charHead.y++;
-    }
-
     
 }

@@ -1,3 +1,6 @@
+import java.awt.Point;
+import java.util.ArrayList;
+
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -16,6 +19,7 @@ public class HelbTowerController {
     private HelbTowerView view;
     private Teleporter teleporter;
     private Wall wall;
+    private Character mainChar;
     
     private static final int WIDTH = 800;
     private static final int HEIGHT = 600;
@@ -27,13 +31,16 @@ public class HelbTowerController {
 
     private int currentDirection;
 
+    private ArrayList<Point> gameElementsPoints = new ArrayList<>();
+
     private static final int RIGHT = 0;
     private static final int LEFT = 1;
     private static final int DOWN = 2;
     private static final int UP = 3;
 
     public HelbTowerController(Stage primaryStage) {
-        model = new HelbTowerModel(ROWS, COLUMNS);
+        mainChar = new Character(5, 2);
+        model = new HelbTowerModel(ROWS, COLUMNS, mainChar.getCharPoint(), gameElementsPoints);
         view = new HelbTowerView(WIDTH, HEIGHT, ROWS, COLUMNS, SQUARE_SIZE, RIGHT, LEFT, DOWN, UP);
         teleporter = new Teleporter(ROWS, COLUMNS);
         wall = new Wall(ROWS, COLUMNS, teleporter.getPortalHashMap());
@@ -55,38 +62,52 @@ public class HelbTowerController {
             public void handle(KeyEvent event) {
                 KeyCode code = event.getCode();
                 if (code == KeyCode.RIGHT || code == KeyCode.D) {
-                    if (wall.isNextCaseIsAWall(model.getCharHead(), RIGHT)) {
-                        model.moveRight();
+                    if (wall.isNextCaseIsAWall(mainChar.getCharPoint(), RIGHT)) {
+                        mainChar.moveRight();
                         currentDirection = RIGHT;
                     }
                 } else if (code == KeyCode.LEFT || code == KeyCode.A) {
-                    if (wall.isNextCaseIsAWall(model.getCharHead(), LEFT)) {
-                        model.moveLeft();
+                    if (wall.isNextCaseIsAWall(mainChar.getCharPoint(), LEFT)) {
+                        mainChar.moveLeft();
                         currentDirection = LEFT;
                     }
                 } else if (code == KeyCode.UP || code == KeyCode.W) {
-                    if (wall.isNextCaseIsAWall(model.getCharHead(), UP)) {
-                        model.moveUp();
+                    if (wall.isNextCaseIsAWall(mainChar.getCharPoint(), UP)) {
+                        mainChar.moveUp();
                         currentDirection = UP;
                     }
                 } else if (code == KeyCode.DOWN || code == KeyCode.S) {
-                    if (wall.isNextCaseIsAWall(model.getCharHead(), DOWN)) {
-                        model.moveDown();
+                    if (wall.isNextCaseIsAWall(mainChar.getCharPoint(), DOWN)) {
+                        mainChar.moveDown();
                         currentDirection = DOWN;
                     }
                 }
-                System.out.println("x:" + model.getCharHead().getX() + " ; y:" + model.getCharHead().getY()); // DEBUG POSITION
+                System.out.println("x:" + mainChar.getCharPoint().getX() + " ; y:" + mainChar.getCharPoint().getY()); // DEBUG POSITION
             }
         });
 
-        model.generateFood();
+        for (int i = 0; i < 8; i++) {
+            wall.generateRandomWall();
+        }
         
-        for (int i = 0; i < model.getCoinCounter(); i++) {
+        gameElementsPoints.add(mainChar.getCharPoint());
+        gameElementsPoints.addAll(wall.getWallArrayList());
+        
+        model.generateFood();
+
+        int numberOfGameElements = (ROWS*COLUMNS)-(gameElementsPoints.size()+3);
+
+        for (int i = 0; i < numberOfGameElements; i++) {
             model.generateCoin();
         }
         
-        //wall.generateRandomWall();
+        view.convertPathToImage(model.getGameElementList(), 
+                                model.getPathToImageMap(),
+                                mainChar.getCharSkinMap(), 
+                                wall.getPathToImg(),
+                                teleporter.getPathToImages());
         
+
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(130), e -> run(gc)));
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
@@ -98,18 +119,17 @@ public class HelbTowerController {
             return;
         }
         view.drawBackground(gc);
-        view.drawWall(wall.getWallArrayList(), wall.getPathToImg(), gc);
-        view.drawTelporter(teleporter.getPortalHashMap(), 
-        teleporter.getPathToImages("red"), 
-        teleporter.getPathToImages("blue"), 
+        view.drawWall(wall.getWallArrayList(), gc);
+        view.drawTelporter(teleporter.getPortalHashMap(),
                            gc);
-        view.drawGameElements(model.getGameElementList(), model.getPathToImageMap(), gc);
-        
-        view.drawChar(model.getCharHead(), currentDirection, gc);
+        view.drawGameElements(model.getGameElementList(), gc);
+
+        view.drawChar(mainChar.getCharPoint(), currentDirection, gc);
         view.drawScore(model.getScore(), model.getCoinCounter(), gc);
-        
+
         model.eatFood();
         model.eatCoin();
-        teleporter.triggerPortal(model.getCharHead());
+        teleporter.triggerPortal(mainChar.getCharPoint());
     }
+
 }

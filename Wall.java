@@ -13,10 +13,10 @@ public class Wall {
         this.rows = rows;
         this.columns = columns;
         this.teleportersHashMap = teleportersHashMap;
-        createBorder();
+        generateBorder();
     }
 
-    public void createBorder() {
+    public void generateBorder() {
         for (int i = 0; i < rows - 1; i++) {
             if (teleportersHashMap.get("portalTop").getX() != i) {
                 wallArrayList.add(new Point(i, 0)); // top border
@@ -25,7 +25,7 @@ public class Wall {
                 wallArrayList.add(new Point(i, columns - 1)); // bottom border
             }
         }
-        for (int i = 0; i < columns - 1; i++) {
+        for (int i = 1; i < columns - 1; i++) {
             if (teleportersHashMap.get("portalLeft").getY() != i) {
                 wallArrayList.add(new Point(0, i)); // left border
             }
@@ -34,13 +34,15 @@ public class Wall {
             }
         }
         wallArrayList.add(new Point(rows-1,columns-1));
+        wallArrayList.add(new Point(rows-1, 0));
     }
 
     public void generateRandomWall() {
-        int posX = (int) (Math.random() * rows + 1);
-        int posY = (int) (Math.random() * columns + 1);
-
+        int posX = (int) (Math.random() * (rows-2) + 1);
+        int posY = (int) (Math.random() * (columns-2) + 1);
         wallArrayList.add(new Point(posX, posY));
+        wallArrayList.add(new Point(posX-1, posY));
+        wallArrayList.add(new Point(posX+1, posY));
     }
 
     public boolean isNextCaseIsAWall(Point charHead, int direction) {

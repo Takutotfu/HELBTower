@@ -5,8 +5,7 @@ public class Coin extends GameElement {
     }
     
     @Override
-    public void triggerAction(HelbTowerModel gameBoard){
-    
+    public void triggerAction(HelbTowerModel gameBoard) {
         gameBoard.decreaseCoinCounter();
         if (gameBoard.getCoinCounter() == 0){
             gameBoard.setGameOver();

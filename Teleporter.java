@@ -33,16 +33,7 @@ public class Teleporter {
         return portalHashMap;
     }
 
-    public String getPathToImages(String color) {
-        switch (color) {
-            case "red":
-                return pathToImgs[1];
-        
-            case "blue":
-                return pathToImgs[0];
-            
-            default:
-                return "";
-        }
+    public String[] getPathToImages() {
+        return pathToImgs;
     }
 }
