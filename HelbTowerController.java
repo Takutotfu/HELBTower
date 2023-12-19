@@ -30,6 +30,7 @@ public class HelbTowerController {
     private GraphicsContext gc;
 
     private int currentDirection;
+    private int numberOfGameElements;
 
     private ArrayList<Point> gameElementsPoints = new ArrayList<>();
 
@@ -44,6 +45,7 @@ public class HelbTowerController {
         view = new HelbTowerView(WIDTH, HEIGHT, ROWS, COLUMNS, SQUARE_SIZE, RIGHT, LEFT, DOWN, UP);
         teleporter = new Teleporter(ROWS, COLUMNS);
         wall = new Wall(ROWS, COLUMNS, teleporter.getPortalHashMap());
+
         start(primaryStage);
     }
 
@@ -66,12 +68,12 @@ public class HelbTowerController {
                         mainChar.moveRight();
                         currentDirection = RIGHT;
                     }
-                } else if (code == KeyCode.LEFT || code == KeyCode.A) {
+                } else if (code == KeyCode.LEFT || code == KeyCode.Q) {
                     if (wall.isNextCaseIsAWall(mainChar.getCharPoint(), LEFT)) {
                         mainChar.moveLeft();
                         currentDirection = LEFT;
                     }
-                } else if (code == KeyCode.UP || code == KeyCode.W) {
+                } else if (code == KeyCode.UP || code == KeyCode.Z) {
                     if (wall.isNextCaseIsAWall(mainChar.getCharPoint(), UP)) {
                         mainChar.moveUp();
                         currentDirection = UP;
@@ -86,16 +88,14 @@ public class HelbTowerController {
             }
         });
 
-        for (int i = 0; i < 8; i++) {
-            wall.generateRandomWall();
-        }
-        
+        wall.generateWall();
         gameElementsPoints.add(mainChar.getCharPoint());
         gameElementsPoints.addAll(wall.getWallArrayList());
-        
-        model.generateFood();
 
-        int numberOfGameElements = (ROWS*COLUMNS)-(gameElementsPoints.size()+3);
+        model.generateFood();
+        System.out.println(gameElementsPoints.size()+teleporter.getPortalHashMap().size());
+
+        numberOfGameElements = (ROWS*COLUMNS)-gameElementsPoints.size()-teleporter.getPortalHashMap().size()+1;
 
         for (int i = 0; i < numberOfGameElements; i++) {
             model.generateCoin();
@@ -108,7 +108,7 @@ public class HelbTowerController {
                                 teleporter.getPathToImages());
         
 
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(130), e -> run(gc)));
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(1), e -> run(gc)));
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
     }

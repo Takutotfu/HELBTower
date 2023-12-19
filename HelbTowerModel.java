@@ -33,7 +33,6 @@ public class HelbTowerModel {
         this.gameElementsPoints = gameElementsPoints;
 
         gameElementList.add(food);
-        gameElementsPoints.add(new Point(food.getPosX(), food.getPosY()));
 
         pathToImageMap.put(foodClassDescriptionString, pathToFoodImage);
         pathToImageMap.put(coinClassDescriptionString, pathToCoinImage);
@@ -129,6 +128,7 @@ public class HelbTowerModel {
             }
         }
     }
+    
     
     // GET & SET
     public int getScore(){

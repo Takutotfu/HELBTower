@@ -37,12 +37,14 @@ public class Wall {
         wallArrayList.add(new Point(rows-1, 0));
     }
 
-    public void generateRandomWall() {
-        int posX = (int) (Math.random() * (rows-2) + 1);
-        int posY = (int) (Math.random() * (columns-2) + 1);
-        wallArrayList.add(new Point(posX, posY));
-        wallArrayList.add(new Point(posX-1, posY));
-        wallArrayList.add(new Point(posX+1, posY));
+    public void generateWall() {
+        for (int i = columns/5; i < columns-(columns/5); i++) {
+            wallArrayList.add(new Point((rows/2)-1,i));
+        }
+        
+        for (int i = rows/5; i < rows-(rows/5); i++) {
+            wallArrayList.add(new Point(i,(columns/2)));
+        }
     }
 
     public boolean isNextCaseIsAWall(Point charHead, int direction) {
