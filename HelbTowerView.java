@@ -87,24 +87,29 @@ public class HelbTowerView {
     }
 
     public void drawTelporter(HashMap<String, Point> teleporters, GraphicsContext gc) {
+        Point portalTop = teleporters.get("portalTop");
+        Point portalDown = teleporters.get("portalDown");
+        Point portalLeft = teleporters.get("portalLeft");
+        Point portalRight = teleporters.get("portalRight");
+
         gc.drawImage(tpSkinBlue, 
-                     teleporters.get("portalTop").getX() * squareSize, 
-                     teleporters.get("portalTop").getY() * squareSize, 
+                     portalTop.getX() * squareSize, 
+                     portalTop.getY() * squareSize, 
                      squareSize, 
                      squareSize);
         gc.drawImage(tpSkinBlue, 
-                     teleporters.get("portalDown").getX() * squareSize, 
-                     teleporters.get("portalDown").getY() * squareSize, 
+                     portalDown.getX() * squareSize, 
+                     portalDown.getY() * squareSize, 
                      squareSize, 
                      squareSize);
         gc.drawImage(tpSkinRed, 
-                     teleporters.get("portalLeft").getX() * squareSize, 
-                     teleporters.get("portalLeft").getY() * squareSize, 
+                     portalLeft.getX() * squareSize, 
+                     portalLeft.getY() * squareSize, 
                      squareSize, 
                      squareSize);
         gc.drawImage(tpSkinRed, 
-                     teleporters.get("portalRight").getX() * squareSize, 
-                     teleporters.get("portalRight").getY() * squareSize, 
+                     portalRight.getX() * squareSize, 
+                     portalRight.getY() * squareSize, 
                      squareSize, 
                      squareSize);
     }

@@ -21,9 +21,9 @@ public class HelbTowerController {
     private Wall wall;
     private Character mainChar;
     
-    private static final int WIDTH = 800;
-    private static final int HEIGHT = 600;
-    private static final int ROWS = 20;
+    private static final int WIDTH = 1050;
+    private static final int HEIGHT = 750;
+    private static final int ROWS = 21;
     private static final int COLUMNS = 15;
     private static final int SQUARE_SIZE = WIDTH / ROWS;
 
@@ -40,7 +40,7 @@ public class HelbTowerController {
     private static final int UP = 3;
 
     public HelbTowerController(Stage primaryStage) {
-        mainChar = new Character(5, 2);
+        mainChar = new Character(6, 2);
         model = new HelbTowerModel(ROWS, COLUMNS, mainChar.getCharPoint(), gameElementsPoints);
         view = new HelbTowerView(WIDTH, HEIGHT, ROWS, COLUMNS, SQUARE_SIZE, RIGHT, LEFT, DOWN, UP);
         teleporter = new Teleporter(ROWS, COLUMNS);
@@ -89,6 +89,7 @@ public class HelbTowerController {
         });
 
         wall.generateWall();
+        wall.generateTower();
         
         gameElementsPoints.add(mainChar.getCharPoint());
         gameElementsPoints.addAll(wall.getWallArrayList());

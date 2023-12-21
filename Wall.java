@@ -5,6 +5,7 @@ import java.util.HashMap;
 public class Wall {
     private int rows;
     private int columns;
+    private int crossOpening = 5;
     private String pathToImg = "img/wall.jpg";
     private ArrayList<Point> wallArrayList = new ArrayList<>();
     private HashMap<String, Point> teleportersHashMap;
@@ -38,21 +39,59 @@ public class Wall {
     }
 
     public void generateWall() {
-        for (int i = columns/5; i < columns-(columns/5); i++) {
-            wallArrayList.add(new Point((rows/2)-1,i));
+        int portalRow = (int) teleportersHashMap.get("portalRight").getY();
+        int portalColumn = (int) teleportersHashMap.get("portalTop").getX();
+
+        for (int i = crossOpening; i < columns-crossOpening; i++) {
+            wallArrayList.add(new Point(portalColumn,i));
         }
         
-        for (int i = rows/5; i < rows-(rows/5); i++) {
-            wallArrayList.add(new Point(i,(columns/2)));
+        for (int i = crossOpening; i < rows-crossOpening; i++) {
+            wallArrayList.add(new Point(i,portalRow));
+        }
+    }
+
+    public void generateTower() {
+        // top left tower
+        for (int i = (rows/4)-1; i <= rows/4; i++) {
+            for (int j = (columns/4)-1; j <= (columns/4); j++) {
+                wallArrayList.add(new Point(i,j));
+            }
+        }
+
+        // top right tower
+        for (int i = rows-(rows/4)-1; i <= rows-(rows/4); i++) {
+            for (int j = (columns/4)-1; j <= (columns/4); j++) {
+                wallArrayList.add(new Point(i,j));
+            }
+        }
+
+        // Bottom left tower
+        for (int i = (rows/4)-1; i <= rows/4; i++) {
+            for (int j = columns-(columns/4)-1; j <= columns-(columns/4); j++) {
+                wallArrayList.add(new Point(i,j));
+            }
+        }
+
+        // Bottom right tower
+        for (int i = rows-(rows/4)-1; i <= rows-(rows/4); i++) {
+            for (int j = columns-(columns/4)-1; j <= columns-(columns/4); j++) {
+                wallArrayList.add(new Point(i,j));
+            }
         }
     }
 
     public boolean isNextCaseIsAWall(Point charHead, int direction) {
+        final int right = 0;
+        final int left = 1;
+        final int down = 2;
+        final int up = 3;
+        
         for (Point wall : wallArrayList) {
-            if ((charHead.getX() - 1 == wall.getX() && charHead.getY() == wall.getY() && direction == 1) ||  // left direction
-                (charHead.getX() + 1 == wall.getX() && charHead.getY() == wall.getY() && direction == 0) ||  // right direction
-                (charHead.getY() - 1 == wall.getY() && charHead.getX() == wall.getX() && direction == 3) ||  // up direction
-                (charHead.getY() + 1 == wall.getY() && charHead.getX() == wall.getX() && direction == 2) ) { // down direction
+            if ((charHead.getX() - 1 == wall.getX() && charHead.getY() == wall.getY() && direction == left) ||  // left direction
+                (charHead.getX() + 1 == wall.getX() && charHead.getY() == wall.getY() && direction == right) ||  // right direction
+                (charHead.getY() - 1 == wall.getY() && charHead.getX() == wall.getX() && direction == up) ||  // up direction
+                (charHead.getY() + 1 == wall.getY() && charHead.getX() == wall.getX() && direction == down) ) { // down direction
                 return false;
             } 
         }
