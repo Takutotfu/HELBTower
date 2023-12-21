@@ -89,11 +89,11 @@ public class HelbTowerController {
         });
 
         wall.generateWall();
+        
         gameElementsPoints.add(mainChar.getCharPoint());
         gameElementsPoints.addAll(wall.getWallArrayList());
 
         model.generateFood();
-        System.out.println(gameElementsPoints.size()+teleporter.getPortalHashMap().size());
 
         numberOfGameElements = (ROWS*COLUMNS)-gameElementsPoints.size()-teleporter.getPortalHashMap().size()+1;
 
@@ -108,7 +108,7 @@ public class HelbTowerController {
                                 teleporter.getPathToImages());
         
 
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(1), e -> run(gc)));
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(20), e -> run(gc)));
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
     }
