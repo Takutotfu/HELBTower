@@ -1,53 +1,55 @@
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Character {
-    private Point charPoint;
-    private Map<String, String> charSkinMap = new HashMap<>();
+    private final String[] IMAGE_PATHS;
+    public static final int RIGHT = 0;
+    public static final int LEFT = 1;
+    public static final int DOWN = 2;
+    public static final int UP = 3;
 
-    public Character(int x, int y) {
+    private Point charPoint;
+    private int direction;
+
+    public Character(int x, int y, String[] imagePaths) {
         charPoint = new Point(x, y);
-        charSkinMap.put("charcterLeft", "img/characterLeft.png");
-        charSkinMap.put("charcterRight", "img/characterRight.png");
-        charSkinMap.put("charcterUp", "img/characterUp.png");
-        charSkinMap.put("charcterDown", "img/characterDown.png");        
+        this.IMAGE_PATHS = imagePaths;
+        direction = RIGHT;
     }
 
-    public boolean isNextCaseIsAvaible(ArrayList<Point> wallArrayList, int direction) {
+    public boolean isNextCaseIsAvaible(ArrayList<Point> wallArrayList) {
         for (Point wall : wallArrayList) {
-            if ((charPoint.getX() - 1 == wall.getX() && charPoint.getY() == wall.getY() && direction == 1) ||  // left direction
-                (charPoint.getX() + 1 == wall.getX() && charPoint.getY() == wall.getY() && direction == 0) ||  // right direction
-                (charPoint.getY() - 1 == wall.getY() && charPoint.getX() == wall.getX() && direction == 3) ||  // up direction
-                (charPoint.getY() + 1 == wall.getY() && charPoint.getX() == wall.getX() && direction == 2) ) { // down direction
+            if ((charPoint.getX() - 1 == wall.getX() && charPoint.getY() == wall.getY() && direction == LEFT) ||  // left direction
+                (charPoint.getX() + 1 == wall.getX() && charPoint.getY() == wall.getY() && direction == RIGHT) ||  // right direction
+                (charPoint.getY() - 1 == wall.getY() && charPoint.getX() == wall.getX() && direction == UP) ||  // up direction
+                (charPoint.getY() + 1 == wall.getY() && charPoint.getX() == wall.getX() && direction == DOWN) ) { // down direction
                 return false;
             } 
         }
         return true;
     }
 
-    public Point getCharPoint() {
-        return charPoint;
-    }
+    public String getImagePath() {return IMAGE_PATHS[0];}
 
-    public Map<String, String> getCharSkinMap() {
-        return charSkinMap;
-    }
+    public String getImagePath(int index) {return IMAGE_PATHS[index];}
 
-    public void moveRight() {
-        charPoint.x++;
-    }
+    public Point getCharPoint() {return charPoint;}
 
-    public void moveLeft() {
-        charPoint.x--;
-    }
+    public void moveRight() {charPoint.x++;}
 
-    public void moveUp() {
-        charPoint.y--;
-    }
+    public void moveLeft() {charPoint.x--;}
 
-    public void moveDown() {
-        charPoint.y++;
-    }
+    public void moveUp() {charPoint.y--;}
+
+    public void moveDown() {charPoint.y++;}
+
+    public void setLeft() {direction = LEFT;}
+    
+    public void setRight() {direction = RIGHT;}
+
+    public void setUp() {direction = UP;}
+
+    public void setDown() {direction = DOWN;}
+
+    public int getCurrentDirection() {return direction;}
 }

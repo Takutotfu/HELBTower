@@ -10,30 +10,25 @@ import javafx.scene.text.Font;
 
 public class HelbTowerView {
     private int width, height, rows, columns, squareSize;
-    private int right, left, down, up;
 
     private Image grassTexture = new Image("img/grass.png");
     private Image grass2Texture = new Image("img/grass2.png");
 
-    private Image wallSkin;
+    private Image wallSkin, currentSkin;
     private Image tpSkinBlue, tpSkinRed;
-    private Image charSkinDown, charSkinUp, charSkinLeft, charSkinRight;
     private Map<String, Image> gameElemImgMap = new HashMap<>();
+    private Map<String, Image> charImgMap = new HashMap<>();
 
-    public HelbTowerView(int width, int height, int rows, int columns, int squareSize, 
-                         int right, int left, int down, int up) {
+    public HelbTowerView(int width, int height, int rows, int columns, int squareSize) {
         this.width = width;
         this.height = height;
         this.rows = rows;
         this.columns = columns;
         this.squareSize = squareSize;
-        this.right = right;
-        this.left = left;
-        this.down = down;
-        this.up = up;
     }
 
-    public void convertPathToImage(ArrayList<GameElement> gameElementList, 
+    public void convertPathToImage(ArrayList<GameElement> gameElementList,
+                                   ArrayList<Character> charList,
                                    Map<String, String> pathTogameElemImgMap, 
                                    Map<String, String> pathToCharSkin, 
                                    String pathToWallSkin, 
@@ -43,10 +38,16 @@ public class HelbTowerView {
             gameElemImgMap.put(gameElem.getClass().getName(), new Image(pathTogameElemImgMap.get(gameElem.getClass().getName())));
         }
 
-        charSkinDown = new Image(pathToCharSkin.get("charcterDown"));
-        charSkinUp = new Image(pathToCharSkin.get("charcterUp"));
-        charSkinLeft = new Image(pathToCharSkin.get("charcterLeft"));
-        charSkinRight = new Image(pathToCharSkin.get("charcterRight"));
+        for (Character character : charList) {
+            charImgMap.put(character.getClass().getName() + "Down",
+                           new Image(pathToCharSkin.get(character.getClass().getName() + "Down")));
+            charImgMap.put(character.getClass().getName() + "Up",
+                           new Image(pathToCharSkin.get(character.getClass().getName() + "Up")));
+            charImgMap.put(character.getClass().getName() + "Right",
+                           new Image(pathToCharSkin.get(character.getClass().getName() + "Right")));
+            charImgMap.put(character.getClass().getName() + "Left",
+                           new Image(pathToCharSkin.get(character.getClass().getName() + "Left")));
+        }
 
         wallSkin = new Image(pathToWallSkin);
 
@@ -114,24 +115,26 @@ public class HelbTowerView {
                      squareSize);
     }
 
-    public void drawChar(Point charHead, int currentDirection, GraphicsContext gc) {
-        Image currentSkin = charSkinDown;
+    public void drawChar(ArrayList<Character> charList, GraphicsContext gc) {
         
-        if (currentDirection == down) {
-            currentSkin = charSkinDown;
-        } else if (currentDirection == up) {
-            currentSkin = charSkinUp;
-        } else if (currentDirection == right) {
-            currentSkin = charSkinRight;
-        } else if (currentDirection == left) {
-            currentSkin = charSkinLeft;
-        }
 
-        gc.drawImage(currentSkin, 
-                     charHead.getX() * squareSize, 
-                     charHead.getY() * squareSize, 
-                     squareSize, 
-                     squareSize);
+        for (Character character : charList) {
+            if (character.getCurrentDirection() == Character.DOWN) {
+                currentSkin = charImgMap.get(character.getClass().getName()+"Down");
+            } else if (character.getCurrentDirection() == Character.UP) {
+                currentSkin = charImgMap.get(character.getClass().getName()+"Up");
+            } else if (character.getCurrentDirection() == Character.RIGHT) {
+                currentSkin = charImgMap.get(character.getClass().getName()+"Right");
+            } else {
+                currentSkin = charImgMap.get(character.getClass().getName()+"Left");
+            }
+
+            gc.drawImage(currentSkin,
+                         character.getCharPoint().getX() * squareSize,
+                         character.getCharPoint().getY() * squareSize,
+                         squareSize,
+                         squareSize);
+        }
     }
 
     public void drawScore(int score, int coinCounter, GraphicsContext gc) {

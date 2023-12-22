@@ -26,6 +26,7 @@ public class Wall {
                 wallArrayList.add(new Point(i, columns - 1)); // bottom border
             }
         }
+
         for (int i = 1; i < columns - 1; i++) {
             if (teleportersHashMap.get("portalLeft").getY() != i) {
                 wallArrayList.add(new Point(0, i)); // left border
@@ -34,6 +35,7 @@ public class Wall {
                 wallArrayList.add(new Point(rows - 1, i)); // right border
             }
         }
+        
         wallArrayList.add(new Point(rows-1,columns-1));
         wallArrayList.add(new Point(rows-1, 0));
     }
@@ -79,23 +81,6 @@ public class Wall {
                 wallArrayList.add(new Point(i,j));
             }
         }
-    }
-
-    public boolean isNextCaseIsAWall(Point charHead, int direction) {
-        final int right = 0;
-        final int left = 1;
-        final int down = 2;
-        final int up = 3;
-        
-        for (Point wall : wallArrayList) {
-            if ((charHead.getX() - 1 == wall.getX() && charHead.getY() == wall.getY() && direction == left) ||  // left direction
-                (charHead.getX() + 1 == wall.getX() && charHead.getY() == wall.getY() && direction == right) ||  // right direction
-                (charHead.getY() - 1 == wall.getY() && charHead.getX() == wall.getX() && direction == up) ||  // up direction
-                (charHead.getY() + 1 == wall.getY() && charHead.getX() == wall.getX() && direction == down) ) { // down direction
-                return false;
-            } 
-        }
-        return true;
     }
 
     public String getPathToImg() {

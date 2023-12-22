@@ -1,5 +1,6 @@
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -19,7 +20,8 @@ public class HelbTowerController {
     private HelbTowerView view;
     private Teleporter teleporter;
     private Wall wall;
-    private Character mainChar;
+    private MainCharacter mainChar;
+    private OrangeGuard orangeGuard;
     
     private static final int WIDTH = 1050;
     private static final int HEIGHT = 750;
@@ -29,20 +31,18 @@ public class HelbTowerController {
 
     private GraphicsContext gc;
 
-    private int currentDirection;
     private int numberOfGameElements;
+    private long tmpTime = System.currentTimeMillis() / 1000;
 
     private ArrayList<Point> gameElementsPoints = new ArrayList<>();
-
-    private static final int RIGHT = 0;
-    private static final int LEFT = 1;
-    private static final int DOWN = 2;
-    private static final int UP = 3;
+    private ArrayList<Character> charactersArray = new ArrayList<>();
+    private HashMap<String, String> charactersPathMap = new HashMap<>();
 
     public HelbTowerController(Stage primaryStage) {
-        mainChar = new Character(6, 2);
+        mainChar = new MainCharacter(6, 2);
+        orangeGuard = new OrangeGuard();
         model = new HelbTowerModel(ROWS, COLUMNS, mainChar.getCharPoint(), gameElementsPoints);
-        view = new HelbTowerView(WIDTH, HEIGHT, ROWS, COLUMNS, SQUARE_SIZE, RIGHT, LEFT, DOWN, UP);
+        view = new HelbTowerView(WIDTH, HEIGHT, ROWS, COLUMNS, SQUARE_SIZE);
         teleporter = new Teleporter(ROWS, COLUMNS);
         wall = new Wall(ROWS, COLUMNS, teleporter.getPortalHashMap());
 
@@ -64,24 +64,24 @@ public class HelbTowerController {
             public void handle(KeyEvent event) {
                 KeyCode code = event.getCode();
                 if (code == KeyCode.RIGHT || code == KeyCode.D) {
-                    if (wall.isNextCaseIsAWall(mainChar.getCharPoint(), RIGHT)) {
+                    mainChar.setRight();
+                    if (mainChar.isNextCaseIsAvaible(wall.getWallArrayList())) {
                         mainChar.moveRight();
-                        currentDirection = RIGHT;
                     }
                 } else if (code == KeyCode.LEFT || code == KeyCode.Q) {
-                    if (wall.isNextCaseIsAWall(mainChar.getCharPoint(), LEFT)) {
+                    mainChar.setLeft();
+                    if (mainChar.isNextCaseIsAvaible(wall.getWallArrayList())) {
                         mainChar.moveLeft();
-                        currentDirection = LEFT;
                     }
                 } else if (code == KeyCode.UP || code == KeyCode.Z) {
-                    if (wall.isNextCaseIsAWall(mainChar.getCharPoint(), UP)) {
+                    mainChar.setUp();
+                    if (mainChar.isNextCaseIsAvaible(wall.getWallArrayList())) {
                         mainChar.moveUp();
-                        currentDirection = UP;
                     }
                 } else if (code == KeyCode.DOWN || code == KeyCode.S) {
-                    if (wall.isNextCaseIsAWall(mainChar.getCharPoint(), DOWN)) {
+                    mainChar.setDown();
+                    if (mainChar.isNextCaseIsAvaible(wall.getWallArrayList())) {
                         mainChar.moveDown();
-                        currentDirection = DOWN;
                     }
                 }
                 System.out.println("x:" + mainChar.getCharPoint().getX() + " ; y:" + mainChar.getCharPoint().getY()); // DEBUG POSITION
@@ -102,9 +102,15 @@ public class HelbTowerController {
             model.generateCoin();
         }
         
+        charactersArray.add(mainChar);
+        charactersArray.add(orangeGuard);
+        charactersPathMap.putAll(mainChar.getCharSkinMap());
+        charactersPathMap.putAll(orangeGuard.getCharSkinMap());
+
         view.convertPathToImage(model.getGameElementList(), 
+                                charactersArray,
                                 model.getPathToImageMap(),
-                                mainChar.getCharSkinMap(), 
+                                charactersPathMap, 
                                 wall.getPathToImg(),
                                 teleporter.getPathToImages());
         
@@ -119,18 +125,30 @@ public class HelbTowerController {
             view.drawGameOver(gc);
             return;
         }
+
         view.drawBackground(gc);
         view.drawWall(wall.getWallArrayList(), gc);
-        view.drawTelporter(teleporter.getPortalHashMap(),
-                           gc);
+        view.drawTelporter(teleporter.getPortalHashMap(), gc);
         view.drawGameElements(model.getGameElementList(), gc);
 
-        view.drawChar(mainChar.getCharPoint(), currentDirection, gc);
+        view.drawChar(charactersArray, gc);
         view.drawScore(model.getScore(), model.getCoinCounter(), gc);
 
         model.eatFood();
         model.eatCoin();
         teleporter.triggerPortal(mainChar.getCharPoint());
+
+        if (model.getCoinCounter() == (int) (numberOfGameElements - (numberOfGameElements * 0.25))) {
+            orangeGuard.setAlive();
+        }
+        
+        if ((System.currentTimeMillis() / 1000) >= (tmpTime + 1)) {
+            orangeGuard.spawnGuard(wall.getWallArrayList());
+            tmpTime = System.currentTimeMillis() / 1000;
+        }
+
+        teleporter.triggerPortal(orangeGuard.getCharPoint());
+
     }
 
 }
