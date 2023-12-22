@@ -90,42 +90,30 @@ public class HelbTowerModel {
     }
 
     public void eatFood() {
-        int cpt = 0;
-
-        if (mainChar.getX() == food.getPosX() && mainChar.getY() == food.getPosY()) {
-
-            while (!(cpt == gameElementsPoints.size() - 1 || gameElementsPoints.get(cpt).getX() == food.getPosX() &&
-                                                             gameElementsPoints.get(cpt).getY() == food.getPosY())) {
-                cpt++;
-            }
-            
-            if (gameElementsPoints.get(cpt).getX() == food.getPosX() &&
-                    gameElementsPoints.get(cpt).getY() == food.getPosY()) {                
-                gameElementsPoints.remove(cpt);
-            }
-
-            food.triggerAction(this);
-        }
+        eatGameElement(food);
     }
     
     public void eatCoin() {
-        int cpt = 0;
-
         for (Coin coin : coinList) {
-            if (mainChar.getX() == coin.getPosX() && mainChar.getY() == coin.getPosY()) {
+            eatGameElement(coin);
+        }
+    }
 
-                while (!(cpt == gameElementsPoints.size() - 1 || gameElementsPoints.get(cpt).getX() == coin.getPosX() &&
-                                                                 gameElementsPoints.get(cpt).getY() == coin.getPosY())) {
-                    cpt++;
-                }
+    public void eatGameElement(GameElement gameElem) {
+        if (mainChar.getX() == gameElem.getPosX() && mainChar.getY() == gameElem.getPosY()) {
+            int cpt = 0;
 
-                if (gameElementsPoints.get(cpt).getX() == coin.getPosX() &&
-                        gameElementsPoints.get(cpt).getY() == coin.getPosY()) {
-                    gameElementsPoints.remove(cpt);
-                }
-
-                coin.triggerAction(this);
+            while (!(cpt == gameElementsPoints.size() - 1 || gameElementsPoints.get(cpt).getX() == gameElem.getPosX() &&
+                    gameElementsPoints.get(cpt).getY() == gameElem.getPosY())) {
+                cpt++;
             }
+
+            if (gameElementsPoints.get(cpt).getX() == gameElem.getPosX() &&
+                    gameElementsPoints.get(cpt).getY() == gameElem.getPosY()) {
+                gameElementsPoints.remove(cpt);
+            }
+
+            gameElem.triggerAction(this);
         }
     }
     

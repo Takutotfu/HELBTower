@@ -22,6 +22,7 @@ public class HelbTowerController {
     private Wall wall;
     private MainCharacter mainChar;
     private OrangeGuard orangeGuard;
+    private BlueGuard blueGuard;
     
     private static final int WIDTH = 1050;
     private static final int HEIGHT = 750;
@@ -29,11 +30,13 @@ public class HelbTowerController {
     private static final int COLUMNS = 15;
     private static final int SQUARE_SIZE = WIDTH / ROWS;
 
+    private static final int TIME_DELAY = 1; // 1sec
+    private long time = System.currentTimeMillis() / 1000;
+
     private GraphicsContext gc;
 
     private int numberOfGameElements;
-    private long tmpTime = System.currentTimeMillis() / 1000;
-
+    
     private ArrayList<Point> gameElementsPoints = new ArrayList<>();
     private ArrayList<Character> charactersArray = new ArrayList<>();
     private HashMap<String, String> charactersPathMap = new HashMap<>();
@@ -41,6 +44,7 @@ public class HelbTowerController {
     public HelbTowerController(Stage primaryStage) {
         mainChar = new MainCharacter(6, 2);
         orangeGuard = new OrangeGuard();
+        blueGuard = new BlueGuard();
         model = new HelbTowerModel(ROWS, COLUMNS, mainChar.getCharPoint(), gameElementsPoints);
         view = new HelbTowerView(WIDTH, HEIGHT, ROWS, COLUMNS, SQUARE_SIZE);
         teleporter = new Teleporter(ROWS, COLUMNS);
@@ -104,8 +108,10 @@ public class HelbTowerController {
         
         charactersArray.add(mainChar);
         charactersArray.add(orangeGuard);
+        charactersArray.add(blueGuard);
         charactersPathMap.putAll(mainChar.getCharSkinMap());
         charactersPathMap.putAll(orangeGuard.getCharSkinMap());
+        charactersPathMap.putAll(blueGuard.getCharSkinMap());
 
         view.convertPathToImage(model.getGameElementList(), 
                                 charactersArray,
@@ -138,13 +144,15 @@ public class HelbTowerController {
         model.eatCoin();
         teleporter.triggerPortal(mainChar.getCharPoint());
 
-        if (model.getCoinCounter() == (int) (numberOfGameElements - (numberOfGameElements * 0.25))) {
+        if (model.getCoinCounter() == (int) (numberOfGameElements - (numberOfGameElements * 0.25)) && !(orangeGuard.isAlive())) {
             orangeGuard.setAlive();
+            blueGuard.setAlive();
         }
         
-        if ((System.currentTimeMillis() / 1000) >= (tmpTime + 1)) {
+        if ((System.currentTimeMillis() / 1000) >= (time + TIME_DELAY)) {
             orangeGuard.spawnGuard(wall.getWallArrayList());
-            tmpTime = System.currentTimeMillis() / 1000;
+            blueGuard.spawnGuard(wall.getWallArrayList());
+            time = System.currentTimeMillis() / 1000;
         }
 
         teleporter.triggerPortal(orangeGuard.getCharPoint());

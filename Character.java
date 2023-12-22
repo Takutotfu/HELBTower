@@ -1,7 +1,7 @@
 import java.awt.Point;
 import java.util.ArrayList;
 
-public class Character {
+public abstract class Character {
     private final String[] IMAGE_PATHS;
     public static final int RIGHT = 0;
     public static final int LEFT = 1;
