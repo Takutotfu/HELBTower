@@ -1,20 +1,19 @@
-import java.awt.Point;
 import java.util.ArrayList;
 public class OrangeGuard extends Guard {
 
     public OrangeGuard() {
-        super(5, 2, new String[]{ "/img/orangeGuardLeft.png",
+        super(5, 3, new String[]{ "/img/orangeGuardLeft.png",
                                       "/img/orangeGuardRight.png",
                                       "/img/orangeGuardUp.png",
                                       "/img/orangeGuardDown.png" });
     }
 
     @Override
-    public void spawnGuard(ArrayList<Point> wallArrayList) {
+    public void spawnGuard(ArrayList<GameElement> gameElementList) {
         if (this.isAlive()) {
             int random = (int) (Math.random() * 4);
             setRandomDirection(random);
-            if (this.isNextCaseIsAvaible(wallArrayList)) {
+            if (this.isNextCaseIsAvaible(gameElementList)) {
                 switch (random) {
                     case 0:
                         moveRight();

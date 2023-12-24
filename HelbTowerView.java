@@ -1,4 +1,3 @@
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,8 +13,7 @@ public class HelbTowerView {
     private Image grassTexture = new Image("img/grass.png");
     private Image grass2Texture = new Image("img/grass2.png");
 
-    private Image wallSkin, currentSkin;
-    private Image tpSkinBlue, tpSkinRed;
+    private Image currentSkin;
     private Map<String, Image> gameElemImgMap = new HashMap<>();
     private Map<String, Image> charImgMap = new HashMap<>();
 
@@ -30,9 +28,7 @@ public class HelbTowerView {
     public void convertPathToImage(ArrayList<GameElement> gameElementList,
                                    ArrayList<Character> charList,
                                    Map<String, String> pathTogameElemImgMap, 
-                                   Map<String, String> pathToCharSkin, 
-                                   String pathToWallSkin, 
-                                   String[] pathToTpSkins) {
+                                   Map<String, String> pathToCharSkin) {
 
         for (GameElement gameElem : gameElementList) {
             gameElemImgMap.put(gameElem.getClass().getName(), new Image(pathTogameElemImgMap.get(gameElem.getClass().getName())));
@@ -49,16 +45,27 @@ public class HelbTowerView {
                            new Image(pathToCharSkin.get(character.getClass().getName() + "Left")));
         }
 
-        wallSkin = new Image(pathToWallSkin);
-
-        tpSkinBlue = new Image(pathToTpSkins[0]);
-        tpSkinRed = new Image(pathToTpSkins[1]);
     }
 
+    public void drawPortal(ArrayList<Teleporter> portalList, GraphicsContext gc) {
+        for (Teleporter teleporter : portalList) {
+            gc.drawImage(gameElemImgMap.get(teleporter.getClass().getName()),
+                        teleporter.getPosX() * squareSize,
+                        teleporter.getPosY() * squareSize,
+                        squareSize,
+                        squareSize);
+            gc.drawImage(gameElemImgMap.get(teleporter.getClass().getName()),
+                        teleporter.getPortalX(2) * squareSize,
+                        teleporter.getPortalY(2) * squareSize,
+                        squareSize,
+                        squareSize);
+        }
+    } 
+
     public void drawGameOver(GraphicsContext gc) {
-        gc.setFill(Color.WHITE);
+        gc.setFill(Color.RED);
         gc.setFont(new Font("Digital-7", 70));
-        gc.fillText("GG you win !", width / 4, height / 2);
+        gc.fillText("Game Over!", width / 3, height / 2);
         return;
     }
 
@@ -77,46 +84,7 @@ public class HelbTowerView {
         }
     }
 
-    public void drawWall(ArrayList<Point> walls, GraphicsContext gc) {
-        for (Point wall : walls) {
-            gc.drawImage(wallSkin, 
-                         wall.getX() * squareSize, 
-                         wall.getY() * squareSize, 
-                         squareSize, 
-                         squareSize);
-        }
-    }
-
-    public void drawTelporter(HashMap<String, Point> teleporters, GraphicsContext gc) {
-        Point portalTop = teleporters.get("portalTop");
-        Point portalDown = teleporters.get("portalDown");
-        Point portalLeft = teleporters.get("portalLeft");
-        Point portalRight = teleporters.get("portalRight");
-
-        gc.drawImage(tpSkinBlue, 
-                     portalTop.getX() * squareSize, 
-                     portalTop.getY() * squareSize, 
-                     squareSize, 
-                     squareSize);
-        gc.drawImage(tpSkinBlue, 
-                     portalDown.getX() * squareSize, 
-                     portalDown.getY() * squareSize, 
-                     squareSize, 
-                     squareSize);
-        gc.drawImage(tpSkinRed, 
-                     portalLeft.getX() * squareSize, 
-                     portalLeft.getY() * squareSize, 
-                     squareSize, 
-                     squareSize);
-        gc.drawImage(tpSkinRed, 
-                     portalRight.getX() * squareSize, 
-                     portalRight.getY() * squareSize, 
-                     squareSize, 
-                     squareSize);
-    }
-
     public void drawChar(ArrayList<Character> charList, GraphicsContext gc) {
-        
 
         for (Character character : charList) {
             if (character.getCurrentDirection() == Character.DOWN) {
@@ -130,8 +98,8 @@ public class HelbTowerView {
             }
 
             gc.drawImage(currentSkin,
-                         character.getCharPoint().getX() * squareSize,
-                         character.getCharPoint().getY() * squareSize,
+                         character.getX() * squareSize,
+                         character.getY() * squareSize,
                          squareSize,
                          squareSize);
         }
@@ -146,11 +114,13 @@ public class HelbTowerView {
 
     public void drawGameElements(ArrayList<GameElement> gameElementList, GraphicsContext gc) {
         for (GameElement gameElem : gameElementList) {
-            gc.drawImage(gameElemImgMap.get(gameElem.getClass().getName()), 
-                         gameElem.getPosX() * squareSize, 
-                         gameElem.getPosY() * squareSize, 
-                         squareSize, 
-                         squareSize);
+            if (!(gameElem instanceof Teleporter)) {
+                gc.drawImage(gameElemImgMap.get(gameElem.getClass().getName()),
+                        gameElem.getPosX() * squareSize,
+                        gameElem.getPosY() * squareSize,
+                        squareSize,
+                        squareSize);
+            }
         }
     }
 }

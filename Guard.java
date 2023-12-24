@@ -1,4 +1,3 @@
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,20 +9,20 @@ public abstract class Guard extends Character {
     public Guard(int x, int y, String[] imagePaths) {
         super(x, y, imagePaths);
 
-        charSkinMap.put(this.getClass().getName()+"Left", getImagePath(0));
-        charSkinMap.put(this.getClass().getName()+"Right", getImagePath(1));
-        charSkinMap.put(this.getClass().getName()+"Up", getImagePath(2));
-        charSkinMap.put(this.getClass().getName()+"Down", getImagePath(3));
+        charSkinMap.put(getClass().getName()+"Left", getImagePath(0));
+        charSkinMap.put(getClass().getName()+"Right", getImagePath(1));
+        charSkinMap.put(getClass().getName()+"Up", getImagePath(2));
+        charSkinMap.put(getClass().getName()+"Down", getImagePath(3));
 
         setDown();
     }
     
     public void setAlive() {
         isAlive = true;
-        this.getCharPoint().setLocation(this.getCharPoint().getX()+1, this.getCharPoint().getY());
+        setLocation(getX()+1, getY());
     }
 
-    public abstract void spawnGuard(ArrayList<Point> wallArrayList);
+    public abstract void spawnGuard(ArrayList<GameElement> wallArrayList);
 
     public boolean isAlive() {return isAlive;}
 

@@ -1,4 +1,3 @@
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -18,26 +17,23 @@ import javafx.util.Duration;
 public class HelbTowerController {
     private HelbTowerModel model;
     private HelbTowerView view;
-    private Teleporter teleporter;
-    private Wall wall;
     private MainCharacter mainChar;
     private OrangeGuard orangeGuard;
     private BlueGuard blueGuard;
+    private PurpleGuard purpleGuard;
+    private RedGuard redGuard;
     
     private static final int WIDTH = 1050;
     private static final int HEIGHT = 750;
     private static final int ROWS = 21;
     private static final int COLUMNS = 15;
     private static final int SQUARE_SIZE = WIDTH / ROWS;
-
-    private static final int TIME_DELAY = 1; // 1sec
-    private long time = System.currentTimeMillis() / 1000;
+    private static final int CROSS_OPENING = 5;
 
     private GraphicsContext gc;
 
     private int numberOfGameElements;
     
-    private ArrayList<Point> gameElementsPoints = new ArrayList<>();
     private ArrayList<Character> charactersArray = new ArrayList<>();
     private HashMap<String, String> charactersPathMap = new HashMap<>();
 
@@ -45,10 +41,10 @@ public class HelbTowerController {
         mainChar = new MainCharacter(6, 2);
         orangeGuard = new OrangeGuard();
         blueGuard = new BlueGuard();
-        model = new HelbTowerModel(ROWS, COLUMNS, mainChar.getCharPoint(), gameElementsPoints);
+        purpleGuard = new PurpleGuard();
+        redGuard = new RedGuard();
+        model = new HelbTowerModel(ROWS, COLUMNS, mainChar);
         view = new HelbTowerView(WIDTH, HEIGHT, ROWS, COLUMNS, SQUARE_SIZE);
-        teleporter = new Teleporter(ROWS, COLUMNS);
-        wall = new Wall(ROWS, COLUMNS, teleporter.getPortalHashMap());
 
         start(primaryStage);
     }
@@ -69,38 +65,36 @@ public class HelbTowerController {
                 KeyCode code = event.getCode();
                 if (code == KeyCode.RIGHT || code == KeyCode.D) {
                     mainChar.setRight();
-                    if (mainChar.isNextCaseIsAvaible(wall.getWallArrayList())) {
+                    if (mainChar.isNextCaseIsAvaible(model.getGameElementList())) {
                         mainChar.moveRight();
                     }
                 } else if (code == KeyCode.LEFT || code == KeyCode.Q) {
                     mainChar.setLeft();
-                    if (mainChar.isNextCaseIsAvaible(wall.getWallArrayList())) {
+                    if (mainChar.isNextCaseIsAvaible(model.getGameElementList())) {
                         mainChar.moveLeft();
                     }
                 } else if (code == KeyCode.UP || code == KeyCode.Z) {
                     mainChar.setUp();
-                    if (mainChar.isNextCaseIsAvaible(wall.getWallArrayList())) {
+                    if (mainChar.isNextCaseIsAvaible(model.getGameElementList())) {
                         mainChar.moveUp();
                     }
                 } else if (code == KeyCode.DOWN || code == KeyCode.S) {
                     mainChar.setDown();
-                    if (mainChar.isNextCaseIsAvaible(wall.getWallArrayList())) {
+                    if (mainChar.isNextCaseIsAvaible(model.getGameElementList())) {
                         mainChar.moveDown();
                     }
                 }
-                System.out.println("x:" + mainChar.getCharPoint().getX() + " ; y:" + mainChar.getCharPoint().getY()); // DEBUG POSITION
+                System.out.println("x:" + mainChar.getX() + " ; y:" + mainChar.getY()); // DEBUG POSITION
             }
         });
 
-        wall.generateWall();
-        wall.generateTower();
+        model.generateBorder();
+        model.generateWall(CROSS_OPENING);
+        model.generateTower();
         
-        gameElementsPoints.add(mainChar.getCharPoint());
-        gameElementsPoints.addAll(wall.getWallArrayList());
-
         model.generateFood();
 
-        numberOfGameElements = (ROWS*COLUMNS)-gameElementsPoints.size()-teleporter.getPortalHashMap().size()+1;
+        numberOfGameElements = (ROWS*COLUMNS)-model.getGameElementList().size();
 
         for (int i = 0; i < numberOfGameElements; i++) {
             model.generateCoin();
@@ -109,16 +103,20 @@ public class HelbTowerController {
         charactersArray.add(mainChar);
         charactersArray.add(orangeGuard);
         charactersArray.add(blueGuard);
+        charactersArray.add(purpleGuard);
+        charactersArray.add(redGuard);
+
         charactersPathMap.putAll(mainChar.getCharSkinMap());
         charactersPathMap.putAll(orangeGuard.getCharSkinMap());
         charactersPathMap.putAll(blueGuard.getCharSkinMap());
+        charactersPathMap.putAll(purpleGuard.getCharSkinMap());
+        charactersPathMap.putAll(redGuard.getCharSkinMap());
+
 
         view.convertPathToImage(model.getGameElementList(), 
                                 charactersArray,
                                 model.getPathToImageMap(),
-                                charactersPathMap, 
-                                wall.getPathToImg(),
-                                teleporter.getPathToImages());
+                                charactersPathMap);
         
 
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(20), e -> run(gc)));
@@ -127,36 +125,49 @@ public class HelbTowerController {
     }
     
     private void run(GraphicsContext gc) {
+        // Views
         if (model.getGameOver()) {
             view.drawGameOver(gc);
             return;
         }
 
         view.drawBackground(gc);
-        view.drawWall(wall.getWallArrayList(), gc);
-        view.drawTelporter(teleporter.getPortalHashMap(), gc);
         view.drawGameElements(model.getGameElementList(), gc);
 
         view.drawChar(charactersArray, gc);
         view.drawScore(model.getScore(), model.getCoinCounter(), gc);
 
+        // Models
         model.eatFood();
         model.eatCoin();
-        teleporter.triggerPortal(mainChar.getCharPoint());
-
-        if (model.getCoinCounter() == (int) (numberOfGameElements - (numberOfGameElements * 0.25)) && !(orangeGuard.isAlive())) {
+        
+        if (is25percentCoinsTaked()) {
             orangeGuard.setAlive();
             blueGuard.setAlive();
+            purpleGuard.setAlive();
+            redGuard.setAlive();
         }
         
-        if ((System.currentTimeMillis() / 1000) >= (time + TIME_DELAY)) {
-            orangeGuard.spawnGuard(wall.getWallArrayList());
-            blueGuard.spawnGuard(wall.getWallArrayList());
-            time = System.currentTimeMillis() / 1000;
+        if (model.isANewCycle()) {
+            orangeGuard.spawnGuard(model.getGameElementList());
+            blueGuard.spawnGuard(model.getGameElementList());
+            //purpleGuard.spawnGuard(wall.getWallArrayList());
+            //redGuard.spawnGuard(wall.getWallArrayList());
         }
 
-        teleporter.triggerPortal(orangeGuard.getCharPoint());
+        model.triggerPortal(mainChar);
+        model.triggerPortal(orangeGuard);
+        model.triggerPortal(blueGuard);
 
+        mainChar.isKillByGuards(charactersArray);
+
+        if (!(mainChar.isAlive())) {
+            model.setGameOver();
+        }
+    }
+    
+    public boolean is25percentCoinsTaked() {
+        return model.getCoinCounter() == (int) (numberOfGameElements - (numberOfGameElements * 0.25)) && !(orangeGuard.isAlive());
     }
 
 }

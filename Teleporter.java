@@ -1,39 +1,41 @@
-import java.awt.Point;
-import java.util.HashMap;
 
-public class Teleporter {
-    private Point portalTop, portalDown, portalLeft, portalRight;
-    private HashMap<String, Point> portalHashMap = new HashMap<>();
-    private String[] pathToImgs = {"img/portalBlue.png", "img/portalRed.png"};
+public class Teleporter extends GameElement {
+    private int portal2PosX;
+    private int portal2PosY;
+    private int skinIndex;
 
-    public Teleporter(int rows, int columns) {
-        portalTop = new Point((rows - 1) / 2, 0);
-        portalDown = new Point((rows - 1) / 2, columns - 1);
-        portalLeft = new Point(0, (columns - 1) / 2);
-        portalRight = new Point(rows - 1, (columns - 1) / 2);
-        portalHashMap.put("portalTop", portalTop);
-        portalHashMap.put("portalDown", portalDown);
-        portalHashMap.put("portalLeft", portalLeft);
-        portalHashMap.put("portalRight", portalRight);
+    public Teleporter(int posX, int posY, int posX2, int posY2, int skinIndex) {
+        super(posX, posY, new String[]{ "img/portalRed.png",
+                                        "img/portalBlue.png" });
+        portal2PosX = posX2;
+        portal2PosY = posY2;
+
+        this.skinIndex = skinIndex;
     }
-
-    public void triggerPortal(Point charHead) {
-        if (charHead.getX() == portalDown.getX() && charHead.getY() == portalDown.getY()) {
-            charHead.setLocation(portalTop.getX(), portalTop.getY() + 1);
-        } else if (charHead.getX() == portalTop.getX() && charHead.getY() == portalTop.getY()) {
-            charHead.setLocation(portalDown.getX(), portalDown.getY() - 1);
-        } else if (charHead.getX() == portalLeft.getX() && charHead.getY() == portalLeft.getY()) {
-            charHead.setLocation(portalRight.getX() - 1, portalRight.getY());
-        } else if (charHead.getX() == portalRight.getX() && charHead.getY() == portalRight.getY()) {
-            charHead.setLocation(portalLeft.getX() + 1, portalLeft.getY());
+    
+    public int getPortalX(int portal) {
+        if (portal == 2) {
+            return portal2PosX;
+        } else {
+            return getPosX();
         }
     }
 
-    public HashMap<String, Point> getPortalHashMap() {
-        return portalHashMap;
+    public int getPortalY(int portal) {
+        if (portal == 2) {
+            return portal2PosY;
+        } else {
+            return getPosY();
+        }
     }
 
-    public String[] getPathToImages() {
-        return pathToImgs;
+    @Override
+    public String getPathToImage(){
+        return getPathToImage(skinIndex);
+    }
+
+    @Override
+    public void triggerAction(HelbTowerModel gameBoard) {
+        
     }
 }

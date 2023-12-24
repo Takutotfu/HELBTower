@@ -1,4 +1,3 @@
-import java.awt.Point;
 import java.util.ArrayList;
 
 public abstract class Character {
@@ -8,23 +7,26 @@ public abstract class Character {
     public static final int DOWN = 2;
     public static final int UP = 3;
 
-    private Point charPoint;
+    private int posX, posY;
     private int direction;
 
-    public Character(int x, int y, String[] imagePaths) {
-        charPoint = new Point(x, y);
+    public Character(int posX, int posY, String[] imagePaths) {
+        this.posX = posX;
+        this.posY = posY;
         this.IMAGE_PATHS = imagePaths;
         direction = RIGHT;
     }
 
-    public boolean isNextCaseIsAvaible(ArrayList<Point> wallArrayList) {
-        for (Point wall : wallArrayList) {
-            if ((charPoint.getX() - 1 == wall.getX() && charPoint.getY() == wall.getY() && direction == LEFT) ||  // left direction
-                (charPoint.getX() + 1 == wall.getX() && charPoint.getY() == wall.getY() && direction == RIGHT) ||  // right direction
-                (charPoint.getY() - 1 == wall.getY() && charPoint.getX() == wall.getX() && direction == UP) ||  // up direction
-                (charPoint.getY() + 1 == wall.getY() && charPoint.getX() == wall.getX() && direction == DOWN) ) { // down direction
-                return false;
-            } 
+    public boolean isNextCaseIsAvaible(ArrayList<GameElement> gameElementsList) {
+        for (GameElement gameElem : gameElementsList) {
+            if (gameElem instanceof Wall) {
+                if ((posX - 1 == gameElem.getPosX() && posY == gameElem.getPosY() && direction == LEFT) || // left direction
+                        (posX + 1 == gameElem.getPosX() && posY == gameElem.getPosY() && direction == RIGHT) || // right direction
+                        (posY - 1 == gameElem.getPosY() && posX == gameElem.getPosX() && direction == UP) || // up direction
+                        (posY + 1 == gameElem.getPosY() && posX == gameElem.getPosX() && direction == DOWN)) { // down direction
+                    return false;
+                }
+            }
         }
         return true;
     }
@@ -33,15 +35,21 @@ public abstract class Character {
 
     public String getImagePath(int index) {return IMAGE_PATHS[index];}
 
-    public Point getCharPoint() {return charPoint;}
+    public int getX() {return posX;}
 
-    public void moveRight() {charPoint.x++;}
+    public int getY() {return posY;}
 
-    public void moveLeft() {charPoint.x--;}
+    public void setLocation(int x, int y) {posX = x; posY = y;} 
+        
+    public void setLocation(double x, double y) {posX = (int) x; posY = (int) y;} 
 
-    public void moveUp() {charPoint.y--;}
+    public void moveRight() {posX++;}
 
-    public void moveDown() {charPoint.y++;}
+    public void moveLeft() {posX--;}
+
+    public void moveUp() {posY--;}
+
+    public void moveDown() {posY++;}
 
     public void setLeft() {direction = LEFT;}
     

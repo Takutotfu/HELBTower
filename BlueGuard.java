@@ -5,7 +5,7 @@ public class BlueGuard extends Guard {
     ArrayList<Point> memoryPosition = new ArrayList<>();
 
     public BlueGuard() {
-        super(16, 2, new String[]{ "/img/blueGuardLeft.png",
+        super(16, 3, new String[]{ "/img/blueGuardLeft.png",
                                       "/img/blueGuardRight.png",
                                       "/img/blueGuardUp.png",
                                       "/img/blueGuardDown.png" });
@@ -13,30 +13,30 @@ public class BlueGuard extends Guard {
     }
 
     @Override
-    public void spawnGuard(ArrayList<Point> wallArrayList) {
+    public void spawnGuard(ArrayList<GameElement> gameElementsList) {
         if (this.isAlive()) {
             int random = (int) (Math.random() * 4);
             setRandomDirection(random);
-            if (this.isNextCaseIsAvaible(wallArrayList) && isNextCaseIsAvaible(memoryPosition)) {
+            if (isNextCaseIsAvaible(gameElementsList)) {
                 switch (random) {
                     case 0:
                         moveRight();
-                        memoryPosition.add(new Point(this.getCharPoint()));
+                        memoryPosition.add(new Point(getX(), getY()));
                         break;
 
                     case 1:
                         moveLeft();
-                        memoryPosition.add(new Point(this.getCharPoint()));
+                        memoryPosition.add(new Point(getX(), getY()));
                         break;
 
                     case 2:
                         moveUp();
-                        memoryPosition.add(new Point(this.getCharPoint()));
+                        memoryPosition.add(new Point(getX(), getY()));
                         break;
 
                     case 3:
                         moveDown();
-                        memoryPosition.add(new Point(this.getCharPoint()));
+                        memoryPosition.add(new Point(getX(), getY()));
                         break;
                 }
             }
