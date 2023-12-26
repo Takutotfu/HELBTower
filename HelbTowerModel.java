@@ -1,6 +1,4 @@
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class HelbTowerModel {
     private int rows;
@@ -22,17 +20,12 @@ public class HelbTowerModel {
     private int coinCounter = 0;
     private Food food = new Food(voidX, voidY);
 
-    private String foodClassDescriptionString = food.getClass().getName();
-    private String coinClassDescriptionString = new Coin(voidX,voidY).getClass().getName();
-    private String wallClassDescriptionString = new Wall(voidX,voidY).getClass().getName();
-    
-    private String pathToFoodImage = food.getPathToImage();
-    private String pathToCoinImage = new Coin(voidX,voidY).getPathToImage();
-    private String pathToWallImage = new Wall(voidX,voidY).getPathToImage();
+    //private String foodClassDescriptionString = food.getClass().getName();
+    //private String pathToFoodImage = food.getPathToImage();
 
     private ArrayList<Coin> coinList = new ArrayList<Coin>();
     private ArrayList<GameElement> gameElementList = new ArrayList<GameElement>();
-    private Map<String, String> pathToImageMap = new HashMap<>();
+    //private Map<String, String> pathToImageMap = new HashMap<>();
 
     public HelbTowerModel(int rows, int columns, Character mainChar) {
         this.rows = rows;
@@ -46,11 +39,11 @@ public class HelbTowerModel {
 
         gameElementList.add(food);
 
-        pathToImageMap.put(foodClassDescriptionString, pathToFoodImage);
-        pathToImageMap.put(coinClassDescriptionString, pathToCoinImage);
-        pathToImageMap.put(wallClassDescriptionString, pathToWallImage);
-        pathToImageMap.put(portalBlue.getClass().getName(), portalBlue.getPathToImage());
-        pathToImageMap.put(portalRed.getClass().getName(), portalRed.getPathToImage());
+        //pathToImageMap.put(foodClassDescriptionString, pathToFoodImage);
+        //System.out.println(portalBlue.getClass().getName() + " " + portalBlue.getPathToImage());
+        //pathToImageMap.put(portalBlue.getClass().getName()+"Blue", portalBlue.getPathToImage());
+        //System.out.println(portalRed.getClass().getName() + " " + portalRed.getPathToImage());
+        //pathToImageMap.put(portalRed.getClass().getName()+"Red", portalRed.getPathToImage());
 
         // spawn area
         spawnRows = rows - 2;
@@ -74,8 +67,8 @@ public class HelbTowerModel {
             food.setPosX(randomXPos);
             food.setPosY(randomYPos);
             food.setFoodImage();
-            pathToFoodImage = food.getPathToImage();
-            pathToImageMap.put(foodClassDescriptionString, pathToFoodImage);
+            //pathToFoodImage = food.getPathToImage();
+            //pathToImageMap.put(foodClassDescriptionString, pathToFoodImage);
             break;
         }
     }
@@ -163,7 +156,7 @@ public class HelbTowerModel {
 
     public void eatFood() {
         if (mainChar.getX() == food.getPosX() && mainChar.getY() == food.getPosY()) {
-            eatGameElement(food);
+            food.triggerAction(this);
             delay -= 100;
             System.out.println(delay);
         }
@@ -173,37 +166,21 @@ public class HelbTowerModel {
     public void eatCoin() {
         for (Coin coin : coinList) {
             if (mainChar.getX() == coin.getPosX() && mainChar.getY() == coin.getPosY()) {
-                eatGameElement(coin);
+                coin.triggerAction(this);
             }
         }
     }
 
-    public void eatGameElement(GameElement gameElem) {
-            int cpt = 0;
-            
-            while (!(cpt == gameElementList.size() - 1 || gameElementList.get(cpt).getPosX() == gameElem.getPosX() &&
-                    gameElementList.get(cpt).getPosY() == gameElem.getPosY())) {
-                cpt++;
-            }
-
-            if (gameElementList.get(cpt).getPosX() == gameElem.getPosX() &&
-                    gameElementList.get(cpt).getPosY() == gameElem.getPosY()) {
-                gameElementList.remove(cpt);
-            }
-
-            gameElem.triggerAction(this);
-        }
-
     public void triggerPortal(Character character) {
         if (character.getX() == portalBlue.getPosX() && character.getY() == portalBlue.getPosY()) {
-            character.setLocation(portalBlue.getPortalX(2), portalBlue.getPortalY(2) - 1);
-        } else if (character.getX() == portalBlue.getPortalX(2) && character.getY() == portalBlue.getPortalY(2)) {
+            character.setLocation(portalBlue.getPortal2X(), portalBlue.getPortal2Y() - 1);
+        } else if (character.getX() == portalBlue.getPortal2X() && character.getY() == portalBlue.getPortal2Y()) {
             character.setLocation(portalBlue.getPosX(), portalBlue.getPosY() + 1);
         }
 
         if (character.getX() == portalRed.getPosX() && character.getY() == portalRed.getPosY()) {
-            character.setLocation(portalRed.getPortalX(2) - 1, portalRed.getPortalY(2));
-        } else if (character.getX() == portalRed.getPortalX(2) && character.getY() == portalRed.getPortalY(2)) {
+            character.setLocation(portalRed.getPortal2X() - 1, portalRed.getPortal2Y());
+        } else if (character.getX() == portalRed.getPortal2X() && character.getY() == portalRed.getPortal2Y()) {
             character.setLocation(portalRed.getPosX() + 1, portalRed.getPosY());
         }
     }
@@ -218,48 +195,30 @@ public class HelbTowerModel {
     
 
     // GET & SET
-    public void setDelay(int newDelay) {
-        delay = newDelay;
-    }
+    public void setDelay(int newDelay) {delay = newDelay;}
 
-    public int getScore(){
-        return score;
-    }
+    public int getScore(){return score;}
     
-    public void setScore(int newScore){
-        this.score = newScore;
-    }
+    public void setScore(int newScore){this.score = newScore;}
     
-    public int getCoinCounter(){
-        return coinCounter;
-    }
+    public int getCoinCounter(){return coinCounter;}
     
-    public void decreaseCoinCounter(){
-        coinCounter--;
-    }
+    public void decreaseCoinCounter(){coinCounter--;}
     
-    public void setGameOver(){
-        gameOver = true;
-    }
+    public void setGameOver(){gameOver = true;}
 
-    public boolean getGameOver() {
-        return gameOver;
-    }
+    public boolean getGameOver() {return gameOver;}
     
-    public int getVoidX(){
-        return voidX;
-    }
+    public int getVoidX(){return voidX;}
     
-    public int getVoidY(){
-        return voidY;
-    }
+    public int getVoidY(){return voidY;}
 
-    public Map<String, String> getPathToImageMap() {
-        return pathToImageMap;
-    }
+    public ArrayList<GameElement> getGameElementList() {return gameElementList;}
 
-    public ArrayList<GameElement> getGameElementList() {
-        return gameElementList;
-    }
+    //public Map<String, String> getPathToImageMap() {return pathToImageMap;}
+
+    public Teleporter getPortalRed() {return portalRed;}
+
+    public Teleporter getPortalBlue() {return portalBlue;}
     
 }

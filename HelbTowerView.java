@@ -27,11 +27,17 @@ public class HelbTowerView {
 
     public void convertPathToImage(ArrayList<GameElement> gameElementList,
                                    ArrayList<Character> charList,
-                                   Map<String, String> pathTogameElemImgMap, 
                                    Map<String, String> pathToCharSkin) {
 
         for (GameElement gameElem : gameElementList) {
-            gameElemImgMap.put(gameElem.getClass().getName(), new Image(pathTogameElemImgMap.get(gameElem.getClass().getName())));
+            if (gameElem instanceof Teleporter) {
+                if (((Teleporter) gameElem).getColor().equals("Red")) {
+                    gameElemImgMap.put(gameElem.getClass().getName() + "Red", new Image(gameElem.getPathToImage()));
+                } else {
+                    gameElemImgMap.put(gameElem.getClass().getName() + "Blue", new Image(gameElem.getPathToImage()));
+                }
+            }
+            gameElemImgMap.put(gameElem.getClass().getName(), new Image(gameElem.getPathToImage()));
         }
 
         for (Character character : charList) {
@@ -55,8 +61,8 @@ public class HelbTowerView {
                         squareSize,
                         squareSize);
             gc.drawImage(gameElemImgMap.get(teleporter.getClass().getName()),
-                        teleporter.getPortalX(2) * squareSize,
-                        teleporter.getPortalY(2) * squareSize,
+                        teleporter.getPortal2X() * squareSize,
+                        teleporter.getPortal2Y() * squareSize,
                         squareSize,
                         squareSize);
         }
@@ -118,6 +124,20 @@ public class HelbTowerView {
                 gc.drawImage(gameElemImgMap.get(gameElem.getClass().getName()),
                         gameElem.getPosX() * squareSize,
                         gameElem.getPosY() * squareSize,
+                        squareSize,
+                        squareSize);
+            } else {
+                Teleporter teleporter = (Teleporter) gameElem;
+                String color = teleporter.getColor().equals("Red") ? "Red" : "Blue";
+                
+                gc.drawImage(gameElemImgMap.get(teleporter.getClass().getName()+color),
+                        teleporter.getPosX() * squareSize,
+                        teleporter.getPosY() * squareSize,
+                        squareSize,
+                        squareSize);
+                gc.drawImage(gameElemImgMap.get(teleporter.getClass().getName()+color),
+                        teleporter.getPortal2X() * squareSize,
+                        teleporter.getPortal2Y() * squareSize,
                         squareSize,
                         squareSize);
             }

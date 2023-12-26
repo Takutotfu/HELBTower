@@ -115,7 +115,6 @@ public class HelbTowerController {
 
         view.convertPathToImage(model.getGameElementList(), 
                                 charactersArray,
-                                model.getPathToImageMap(),
                                 charactersPathMap);
         
 
