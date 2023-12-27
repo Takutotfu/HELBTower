@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 
 public class RedGuard extends Guard {
 
@@ -9,12 +8,5 @@ public class RedGuard extends Guard {
                                       "/img/redGuardDown.png" });
 
     }
-
-    @Override
-    public void spawnGuard(ArrayList<GameElement> wallArrayList) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'spawnGuard'");
-    }
-
   
 }

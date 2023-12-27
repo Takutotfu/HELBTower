@@ -30,10 +30,10 @@ public class HelbTowerController {
     private static final int SQUARE_SIZE = WIDTH / ROWS;
     private static final int CROSS_OPENING = 5;
 
+    private int coinNbr;
+
     private GraphicsContext gc;
 
-    private int numberOfGameElements;
-    
     private ArrayList<Character> charactersArray = new ArrayList<>();
     private HashMap<String, String> charactersPathMap = new HashMap<>();
 
@@ -91,14 +91,10 @@ public class HelbTowerController {
         model.generateBorder();
         model.generateWall(CROSS_OPENING);
         model.generateTower();
-        
         model.generateFood();
+        model.generateCoin();
 
-        numberOfGameElements = (ROWS*COLUMNS)-model.getGameElementList().size();
-
-        for (int i = 0; i < numberOfGameElements; i++) {
-            model.generateCoin();
-        }
+        coinNbr = model.getCoinCounter();
         
         charactersArray.add(mainChar);
         charactersArray.add(orangeGuard);
@@ -149,7 +145,7 @@ public class HelbTowerController {
         
         if (model.isANewCycle()) {
             orangeGuard.spawnGuard(model.getGameElementList());
-            blueGuard.spawnGuard(model.getGameElementList());
+            blueGuard.spawnGuard(model.getGameElementList(), ROWS, COLUMNS);
             //purpleGuard.spawnGuard(wall.getWallArrayList());
             //redGuard.spawnGuard(wall.getWallArrayList());
         }
@@ -166,7 +162,10 @@ public class HelbTowerController {
     }
     
     public boolean is25percentCoinsTaked() {
-        return model.getCoinCounter() == (int) (numberOfGameElements - (numberOfGameElements * 0.25)) && !(orangeGuard.isAlive());
+        return model.getCoinCounter() == (int) (coinNbr * 0.75) && !( (orangeGuard.isAlive()) && 
+                                                                      (blueGuard.isAlive()) &&
+                                                                      (purpleGuard.isAlive()) &&
+                                                                      (redGuard.isAlive()) );
     }
 
 }

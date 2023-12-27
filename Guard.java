@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,8 +20,6 @@ public abstract class Guard extends Character {
         isAlive = true;
         setLocation(getX()+1, getY());
     }
-
-    public abstract void spawnGuard(ArrayList<GameElement> wallArrayList);
 
     public boolean isAlive() {return isAlive;}
 

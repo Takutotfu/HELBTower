@@ -3,8 +3,6 @@ import java.util.ArrayList;
 public class HelbTowerModel {
     private int rows;
     private int columns;
-    private int spawnRows;
-    private int spawnColumns;
     private int voidX = -2;
     private int voidY = -2;
 
@@ -44,18 +42,13 @@ public class HelbTowerModel {
         //pathToImageMap.put(portalBlue.getClass().getName()+"Blue", portalBlue.getPathToImage());
         //System.out.println(portalRed.getClass().getName() + " " + portalRed.getPathToImage());
         //pathToImageMap.put(portalRed.getClass().getName()+"Red", portalRed.getPathToImage());
-
-        // spawn area
-        spawnRows = rows - 2;
-        spawnColumns = columns - 2;
     }
 
     public void generateFood() {
         start:
         while (true) {
-            // 1 -> spawnRows/spawnColumns
-            int randomXPos = (int) (Math.random() * spawnRows + 1);
-            int randomYPos = (int) (Math.random() * spawnColumns + 1);
+            int randomXPos = (int) (Math.random() * rows);
+            int randomYPos = (int) (Math.random() * columns);
 
             for (GameElement gameElement : gameElementList) {
                 if (gameElement.getPosX() == randomXPos 
@@ -74,24 +67,15 @@ public class HelbTowerModel {
     }
     
     public void generateCoin() {
-        start:
-        while (true) {
-            // 1 -> spawnRows/spawnColumns
-            int randomXPos = (int) (Math.random() * spawnRows + 1);
-            int randomYPos = (int) (Math.random() * spawnColumns + 1);
-
-            for (GameElement gameElement : gameElementList) {
-                if (gameElement.getPosX() == randomXPos 
-                        && gameElement.getPosY() == randomYPos) {
-                    continue start;
+        for (int i = 0; i < rows - 1; i++) {
+            for (int j = 0; j < columns - 1; j++) {
+                if (!(isGameElemInCase(i, j))) {
+                    Coin newCoin = new Coin(i, j);
+                    coinList.add(newCoin);
+                    gameElementList.add(newCoin);
+                    coinCounter++;
                 }
             }
-            
-            Coin newCoin = new Coin(randomXPos, randomYPos);
-            coinList.add(newCoin);
-            gameElementList.add(newCoin);
-            coinCounter++;
-            break;
         }
     }
 
@@ -189,6 +173,16 @@ public class HelbTowerModel {
         if (System.currentTimeMillis() >= (tmpTime + delay)) {
             tmpTime = System.currentTimeMillis();
             return true;
+        }
+        return false;
+    }
+
+    public boolean isGameElemInCase(int x, int y) {
+        for (GameElement gameElement : gameElementList) {
+            if (gameElement.getPosX() == x
+                    && gameElement.getPosY() == y) {
+                        return true;
+            }
         }
         return false;
     }

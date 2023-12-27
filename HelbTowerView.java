@@ -120,24 +120,24 @@ public class HelbTowerView {
 
     public void drawGameElements(ArrayList<GameElement> gameElementList, GraphicsContext gc) {
         for (GameElement gameElem : gameElementList) {
-            if (!(gameElem instanceof Teleporter)) {
-                gc.drawImage(gameElemImgMap.get(gameElem.getClass().getName()),
-                        gameElem.getPosX() * squareSize,
-                        gameElem.getPosY() * squareSize,
-                        squareSize,
-                        squareSize);
-            } else {
+            if (gameElem instanceof Teleporter) {
                 Teleporter teleporter = (Teleporter) gameElem;
                 String color = teleporter.getColor().equals("Red") ? "Red" : "Blue";
-                
-                gc.drawImage(gameElemImgMap.get(teleporter.getClass().getName()+color),
+                gc.drawImage(gameElemImgMap.get(teleporter.getClass().getName() + color),
                         teleporter.getPosX() * squareSize,
                         teleporter.getPosY() * squareSize,
                         squareSize,
                         squareSize);
-                gc.drawImage(gameElemImgMap.get(teleporter.getClass().getName()+color),
+                gc.drawImage(gameElemImgMap.get(teleporter.getClass().getName() + color),
                         teleporter.getPortal2X() * squareSize,
                         teleporter.getPortal2Y() * squareSize,
+                        squareSize,
+                        squareSize);
+                
+            } else {
+                gc.drawImage(gameElemImgMap.get(gameElem.getClass().getName()),
+                        gameElem.getPosX() * squareSize,
+                        gameElem.getPosY() * squareSize,
                         squareSize,
                         squareSize);
             }

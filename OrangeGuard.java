@@ -8,7 +8,6 @@ public class OrangeGuard extends Guard {
                                       "/img/orangeGuardDown.png" });
     }
 
-    @Override
     public void spawnGuard(ArrayList<GameElement> gameElementList) {
         if (this.isAlive()) {
             int random = (int) (Math.random() * 4);
