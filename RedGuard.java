@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 
 public class RedGuard extends Guard {
 
@@ -6,7 +7,20 @@ public class RedGuard extends Guard {
                                       "/img/redGuardRight.png",
                                       "/img/redGuardUp.png",
                                       "/img/redGuardDown.png" });
+    }
 
+    public void move(ArrayList<GameElement> gameElementList, int x, int y) {
+        if (isAlive()) {
+            if (x < getX() && isMoveOk(gameElementList, getX()-1, getY())) {
+                moveLeft();
+            } else if (x > getX() && isMoveOk(gameElementList, getX()+1, getY())) {
+                moveRight();
+            } else if (y > getY() && isMoveOk(gameElementList, getX(), getY()+1)) {
+                moveDown();
+            } else if (y < getY() && isMoveOk(gameElementList, getX(), getY()-1)) {
+                moveUp();
+            }
+        }
     }
   
 }

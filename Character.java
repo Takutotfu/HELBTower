@@ -43,13 +43,13 @@ public abstract class Character {
         
     public void setLocation(double x, double y) {posX = (int) x; posY = (int) y;} 
 
-    public void moveRight() {posX++;}
+    public void moveRight() {posX++; direction = RIGHT;}
 
-    public void moveLeft() {posX--;}
+    public void moveLeft() {posX--; direction = LEFT;}
 
-    public void moveUp() {posY--;}
+    public void moveUp() {posY--; direction = UP;}
 
-    public void moveDown() {posY++;}
+    public void moveDown() {posY++; direction = DOWN;}
 
     public void setLeft() {direction = LEFT;}
     

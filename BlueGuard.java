@@ -69,18 +69,5 @@ public class BlueGuard extends Guard {
             break;
         }
     }
-
-    // Si la position x;y n'est pas un mur ou un teleporter
-    private boolean isMoveOk(ArrayList<GameElement> gameElementList, int x, int y) {
-        for (GameElement gameElement : gameElementList) {
-            if (gameElement instanceof Wall || gameElement instanceof Teleporter) {
-                if (gameElement.getPosX() == x
-                        && gameElement.getPosY() == y) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
     
 }

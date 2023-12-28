@@ -38,7 +38,7 @@ public class HelbTowerController {
     private HashMap<String, String> charactersPathMap = new HashMap<>();
 
     public HelbTowerController(Stage primaryStage) {
-        mainChar = new MainCharacter(6, 2);
+        mainChar = new MainCharacter(ROWS/2, COLUMNS/4);
         orangeGuard = new OrangeGuard();
         blueGuard = new BlueGuard();
         purpleGuard = new PurpleGuard();
@@ -144,17 +144,15 @@ public class HelbTowerController {
         }
         
         if (model.isANewCycle()) {
-            orangeGuard.spawnGuard(model.getGameElementList());
+            orangeGuard.move(model.getGameElementList());
             blueGuard.move(model.getGameElementList(), ROWS, COLUMNS);
-            //purpleGuard.spawnGuard(wall.getWallArrayList());
-            //redGuard.spawnGuard(wall.getWallArrayList());
+            purpleGuard.move(model.getGameElementList());
+            redGuard.move(model.getGameElementList(), mainChar.getX(), mainChar.getY());
         }
 
         model.triggerPortal(mainChar);
-        model.triggerPortal(orangeGuard);
-        model.triggerPortal(blueGuard);
 
-        mainChar.isKillByGuards(charactersArray);
+        //mainChar.isKillByGuards(charactersArray);
 
         if (!(mainChar.isAlive())) {
             model.setGameOver();

@@ -1,57 +1,46 @@
 import java.util.ArrayList;
+
 public class OrangeGuard extends Guard {
 
     public OrangeGuard() {
-        super(5, 3, new String[]{ "/img/orangeGuardLeft.png",
-                                      "/img/orangeGuardRight.png",
-                                      "/img/orangeGuardUp.png",
-                                      "/img/orangeGuardDown.png" });
+        super(5, 3, new String[] { "/img/orangeGuardLeft.png",
+                                       "/img/orangeGuardRight.png",
+                                       "/img/orangeGuardUp.png",
+                                       "/img/orangeGuardDown.png" });
     }
 
-    public void spawnGuard(ArrayList<GameElement> gameElementList) {
-        if (this.isAlive()) {
+    public void move(ArrayList<GameElement> gameElementList) {
+        if (isAlive()) {
             int random = (int) (Math.random() * 4);
-            setRandomDirection(random);
-            if (this.isNextCaseIsAvaible(gameElementList)) {
-                switch (random) {
-                    case 0:
+            switch (random) {
+                case 0:
+                    setRight();
+                    if (isMoveOk(gameElementList, getX() + 1, getY())) {
                         moveRight();
-                        break;
+                    }
+                    break;
 
-                    case 1:
+                case 1:
+                    setLeft();
+                    if (isMoveOk(gameElementList, getX() - 1, getY())) {
                         moveLeft();
-                        break;
+                    }
+                    break;
 
-                    case 2:
+                case 2:
+                    setUp();
+                    if (isMoveOk(gameElementList, getX(), getY() - 1)) {
                         moveUp();
-                        break;
+                    }
+                    break;
 
-                    case 3:
+                case 3:
+                    setDown();
+                    if (isMoveOk(gameElementList, getX(), getY() + 1)) {
                         moveDown();
-                        break;
-                }
+                    }
+                    break;
             }
         }
     }
-
-    private void setRandomDirection(int random) {
-        switch (random) {
-            case 0:
-                setRight();
-                break;
-
-            case 1:
-                setLeft();
-                break;
-            
-            case 2:
-                setUp();
-                break;
-            
-            case 3:
-                setDown();
-                break;
-        }
-    }
-    
 }
