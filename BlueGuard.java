@@ -2,9 +2,9 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 public class BlueGuard extends Guard {
-    ArrayList<Point> memoryPosition = new ArrayList<>();
-    Point currentDirection;
-    boolean currentDirectionHasReached = true;
+    private ArrayList<Point> memoryPosition = new ArrayList<>();
+    private Point currentDirection;
+    private boolean currentDirectionHasReached = true;
 
     public BlueGuard() {
         super(16, 3, new String[]{ "/img/blueGuardLeft.png",
@@ -13,32 +13,38 @@ public class BlueGuard extends Guard {
                                       "/img/blueGuardDown.png" });
     }
 
-    public void spawnGuard(ArrayList<GameElement> gameElementList, int rows, int columns) {
-        if (this.isAlive()) {
-
+    public void move(ArrayList<GameElement> gameElementList, int rows, int columns) {
+        if (isAlive()) {
             if (currentDirectionHasReached) {
                 setRandomDirection(gameElementList, rows, columns);
-            } else if (isNextCaseIsAvaible(gameElementList)) {
-                if (currentDirection.getX() < getX()) {
-                    moveLeft();
-                } else if (currentDirection.getX() > getX()) {
-                    moveRight();
-                } else if (currentDirection.getY() > getY()) {
-                    moveDown();
-                } else if (currentDirection.getY() < getY()) {
-                    moveUp();
-                }
+            } else {
+                moveTowards(gameElementList);
             }
-
-            if (currentDirection.getX() == getX() && currentDirection.getY() == getY()) {
-                currentDirectionHasReached = true;
-            }
-            
-            System.out.println("x:"+getX()+";y:"+getY());
         }
     }
 
-    
+    public void moveTowards(ArrayList<GameElement> gameElementList) {
+        // On verifie si la currentDirection est atteinte
+        if (currentDirection.getX() == getX() && currentDirection.getY() == getY()) {
+            currentDirectionHasReached = true;
+            memoryPosition.add(currentDirection);
+        }
+
+        if (currentDirection.getX() < getX() && isMoveOk(gameElementList, getX()-1, getY())) {
+            moveLeft();
+        } else if (currentDirection.getX() > getX() && isMoveOk(gameElementList, getX()+1, getY())) {
+            moveRight();
+        } else if (currentDirection.getY() > getY() && isMoveOk(gameElementList, getX(), getY()+1)) {
+            moveDown();
+        } else if (currentDirection.getY() < getY() && isMoveOk(gameElementList, getX(), getY()-1)) {
+            moveUp();
+        } else {
+            // Direction inatteignable on regénère et on sauvegarde la position actuelle
+            currentDirectionHasReached = true;
+            memoryPosition.add(new Point(getX(), getY()));
+        }
+        
+    }
 
     private void setRandomDirection(ArrayList<GameElement> gameElementList, int rows, int columns) {
         start:
@@ -46,30 +52,35 @@ public class BlueGuard extends Guard {
             int randomXPos = (int) (Math.random() * rows);
             int randomYPos = (int) (Math.random() * columns);
 
-            for (GameElement gameElement : gameElementList) {
-                if (gameElement instanceof Wall) {
-                    if (gameElement.getPosX() == randomXPos 
-                            && gameElement.getPosY() == randomYPos) {
-                        continue start;
-                    }
-                }
+            if (!(isMoveOk(gameElementList, randomXPos, randomYPos))) {
+                continue start;
             }
             
             for (Point position : memoryPosition) {
                 if (position.getX() == randomXPos 
                         && position.getY() == randomYPos) {
+                    
                     continue start;
                 }
             }
 
-            System.out.println("Blue guard direction: x:"+randomXPos+";y:"+randomYPos);
-
-            Point newDirection = new Point(randomXPos, randomYPos);
-            currentDirection = newDirection;
-            memoryPosition.add(newDirection);
+            currentDirection = new Point(randomXPos, randomYPos);
             currentDirectionHasReached = false;
             break;
         }
+    }
+
+    // Si la position x;y n'est pas un mur ou un teleporter
+    private boolean isMoveOk(ArrayList<GameElement> gameElementList, int x, int y) {
+        for (GameElement gameElement : gameElementList) {
+            if (gameElement instanceof Wall || gameElement instanceof Teleporter) {
+                if (gameElement.getPosX() == x
+                        && gameElement.getPosY() == y) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
     
 }

@@ -145,7 +145,7 @@ public class HelbTowerController {
         
         if (model.isANewCycle()) {
             orangeGuard.spawnGuard(model.getGameElementList());
-            blueGuard.spawnGuard(model.getGameElementList(), ROWS, COLUMNS);
+            blueGuard.move(model.getGameElementList(), ROWS, COLUMNS);
             //purpleGuard.spawnGuard(wall.getWallArrayList());
             //redGuard.spawnGuard(wall.getWallArrayList());
         }

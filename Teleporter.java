@@ -1,9 +1,7 @@
-
 public class Teleporter extends GameElement {
     private int portal2PosX;
     private int portal2PosY;
     private int skinIndex;
-    private String color;
 
     public Teleporter(int posX, int posY, int posX2, int posY2, int skinIndex) {
         super(posX, posY, new String[]{ "img/portalRed.png",
@@ -18,7 +16,7 @@ public class Teleporter extends GameElement {
 
     public int getPortal2Y() {return portal2PosY;}
 
-    public String getColor() {return color = skinIndex == 0 ? "Red" : "Blue";}
+    public String getColor() {return skinIndex == 0 ? "Red" : "Blue";}
 
     @Override
     public String getPathToImage(){return getPathToImage(skinIndex);}
