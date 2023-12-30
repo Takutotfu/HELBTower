@@ -21,5 +21,5 @@ public class Teleporter extends GameElement {
     @Override
     public String getPathToImage(){return getPathToImage(skinIndex);}
 
-    public void triggerAction(HelbTowerModel gameBoard) {}
+    public void triggerAction(HelbTowerModel gameBoard) {System.out.println("Tp other portal");}
 }

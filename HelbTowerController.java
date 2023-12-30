@@ -34,14 +34,10 @@ public class HelbTowerController {
 
     private int coinNbr;
     private int maxCaseForBlueGuard = 0;
-    private int potionCooldown = 0;
 
     private long lastTimeKeyPressed = System.currentTimeMillis();
     private long lastTimeGuardMove = System.currentTimeMillis();
     private long lastTimePurpleGuardMove = System.currentTimeMillis();
-    private long lastTimePotionTaked;
-
-    private boolean isPotionEffect = false;
 
     private GraphicsContext gc;
 
@@ -74,39 +70,46 @@ public class HelbTowerController {
             @Override
             public void handle(KeyEvent event) {
                 KeyCode code = event.getCode();
-                if (model.isANewCycle(lastTimeKeyPressed, model.getDelay()) || isPotionEffect) {
+                if (model.isANewCycle(lastTimeKeyPressed, model.getDelay()) || model.isPotionEffect()) {
                     lastTimeKeyPressed = System.currentTimeMillis();
 
                     if (code == KeyCode.RIGHT || code == KeyCode.D) {
                         mainChar.setRight();
-                        if (mainChar.isNextCaseIsAvaible(model.getGameElementList())) {
+                        if (mainChar.isNextCaseIsAvaible(model.getGameElementList())
+                                || model.isWearingCloak() && mainChar.getX() + 1 < ROWS - 1) {
                             mainChar.moveRight();
                         }
                     } else if (code == KeyCode.LEFT || code == KeyCode.Q) {
                         mainChar.setLeft();
-                        if (mainChar.isNextCaseIsAvaible(model.getGameElementList())) {
+                        if (mainChar.isNextCaseIsAvaible(model.getGameElementList())
+                                || model.isWearingCloak() && mainChar.getX() - 1 >= 0) {
                             mainChar.moveLeft();
                         }
                     } else if (code == KeyCode.UP || code == KeyCode.Z) {
                         mainChar.setUp();
-                        if (mainChar.isNextCaseIsAvaible(model.getGameElementList())) {
+                        if (mainChar.isNextCaseIsAvaible(model.getGameElementList())
+                                || model.isWearingCloak() && mainChar.getY() - 1 > 0) {
                             mainChar.moveUp();
                         }
                     } else if (code == KeyCode.DOWN || code == KeyCode.S) {
                         mainChar.setDown();
-                        if (mainChar.isNextCaseIsAvaible(model.getGameElementList())) {
+                        if (mainChar.isNextCaseIsAvaible(model.getGameElementList())
+                                || model.isWearingCloak() && mainChar.getY() + 1 < COLUMNS - 1) {
                             mainChar.moveDown();
                         }
                     }
                     System.out.println("x:" + mainChar.getX() + " ; y:" + mainChar.getY()); // DEBUG POSITION
-
                 }
+
             }
         });
 
         model.generateBorder();
         model.generateWall(CROSS_OPENING);
         model.generateTower(TOWER_X, TOWER_Y);
+        for (int i = 0; i < 5; i++) {
+            model.generateCloak();
+        }
         for (int i = 0; i < 6; i++) {
             model.generatePotion();
         }
@@ -155,22 +158,7 @@ public class HelbTowerController {
         view.drawScore(model.getScore(), model.getCoinCounter(), gc);
 
         // Models
-        model.drinkPotion();
-
-        for (Potion potion : model.getPotionList()) {
-            if (potion.isTaked()) {
-                lastTimePotionTaked = System.currentTimeMillis();
-                isPotionEffect = true;
-                potionCooldown = potion.getDuration();
-            }
-            potion.unsetTaked();
-        }
-
-        if (model.isANewCycle(lastTimePotionTaked, potionCooldown)) {
-            isPotionEffect = false;
-        }
-
-        model.eatCoin();
+        model.eatGameElement();
 
         if (is25percentCoinsTaked()) {
             orangeGuard.setAlive();

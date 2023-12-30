@@ -14,6 +14,12 @@ public class HelbTowerModel {
     private int delay = 300; // 1000 = 1sec
     private int purpleDelay = 300;
 
+    private boolean isWearingCloak = false;
+
+    private long lastTimePotionTaked;
+    private boolean isPotionEffect = false;
+    private int potionCooldown = 0;
+
     private int score;
     private int coinCounter = 0;
 
@@ -21,7 +27,6 @@ public class HelbTowerModel {
     //private String pathToFoodImage = food.getPathToImage();
 
     private ArrayList<Coin> coinList = new ArrayList<Coin>();
-    private ArrayList<Potion> potionList = new ArrayList<Potion>();
     private ArrayList<GameElement> gameElementList = new ArrayList<GameElement>();
     //private Map<String, String> pathToImageMap = new HashMap<>();
 
@@ -43,6 +48,26 @@ public class HelbTowerModel {
         //pathToImageMap.put(portalRed.getClass().getName()+"Red", portalRed.getPathToImage());
     }
 
+    public void generateCloak() {
+        start:
+        while (true) {
+            int randomXPos = (int) (Math.random() * rows);
+            int randomYPos = (int) (Math.random() * columns);
+
+            for (GameElement gameElement : gameElementList) {
+                if (gameElement.getPosX() == randomXPos 
+                        && gameElement.getPosY() == randomYPos) {
+                    continue start;
+                }
+            }
+
+            Cloak newCloak = new Cloak(randomXPos, randomYPos);
+
+            gameElementList.add(newCloak);
+            break;
+        }
+    }
+
     public void generatePotion() {
         start:
         while (true) {
@@ -58,7 +83,6 @@ public class HelbTowerModel {
             }
 
             Potion newPotion = new Potion(randomXPos, randomYPos, randomPotion);
-            potionList.add(newPotion);
             gameElementList.add(newPotion);
 
             //pathToFoodImage = food.getPathToImage();
@@ -139,21 +163,39 @@ public class HelbTowerModel {
         }
     }
 
-    
-    public void eatCoin() {
-        for (Coin coin : coinList) {
-            if (mainChar.getX() == coin.getPosX() && mainChar.getY() == coin.getPosY()) {
-                coin.triggerAction(this);
-                purpleDelay -= 3;
+    public void eatGameElement() {
+        for (GameElement gameElem : gameElementList) {
+            if (gameElem.getPosX() == mainChar.getX() && gameElem.getPosY() == mainChar.getY()) {
+                gameElem.triggerAction(this);
+
+                if (gameElem instanceof Coin) { // Eat Coin
+                    purpleDelay--;
+
+                } else if (gameElem instanceof Potion) { // Drink Potion
+                    Potion potion = (Potion) gameElem;
+                    lastTimePotionTaked = System.currentTimeMillis();
+
+                    if (potion.isTaked()) {
+                        isPotionEffect = true;
+                        potionCooldown = potion.getDuration();
+                        potion.unsetTaked();
+                    }
+
+                } else if (gameElem instanceof Cloak) { // Take Cloak
+                    Cloak cloak = (Cloak) gameElem;
+                
+                    if (cloak.isTaked()) {
+                        isWearingCloak = true;
+                    }
+                    cloak.unsetTaked();
+
+                } else if (gameElem instanceof Wall) { // Passed trough a Wall
+                    isWearingCloak = false;
+                }
             }
         }
-    }
-
-    public void drinkPotion() {
-        for (Potion potion : potionList) {
-            if (mainChar.getX() == potion.getPosX() && mainChar.getY() == potion.getPosY()) {
-                potion.triggerAction(this);
-            }
+        if (isEffectFinish(lastTimePotionTaked, potionCooldown)) { // verifPotionFinish
+            isPotionEffect = false;
         }
     }
 
@@ -169,6 +211,10 @@ public class HelbTowerModel {
         } else if (character.getX() == portalRed.getPortal2X() && character.getY() == portalRed.getPortal2Y()) {
             character.setLocation(portalRed.getPosX() + 1, portalRed.getPosY());
         }
+    }
+
+    public boolean isEffectFinish(long lastTimeTaked, int cooldown) {
+        return System.currentTimeMillis() >= (lastTimeTaked + cooldown);
     }
 
     public boolean isANewCycle(long time, int delay) {
@@ -193,6 +239,10 @@ public class HelbTowerModel {
 
     public int getPurpleDelay() {return purpleDelay;}
 
+    public boolean isPotionEffect() {return isPotionEffect;}
+
+    public boolean isWearingCloak() {return isWearingCloak;}
+
     public int getScore(){return score;}
     
     public void setScore(int newScore){this.score = newScore;}
@@ -210,8 +260,6 @@ public class HelbTowerModel {
     public int getVoidY(){return voidY;}
 
     public ArrayList<GameElement> getGameElementList() {return gameElementList;}
-
-    public ArrayList<Potion> getPotionList() {return potionList;}
 
     //public Map<String, String> getPathToImageMap() {return pathToImageMap;}
 
