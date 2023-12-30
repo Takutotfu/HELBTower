@@ -18,6 +18,7 @@ public class PurpleGuard extends Guard {
         towersPosition.add(new Point(x+1, columns-towerY)); // bottom right tower
     }
 
+    @Override
     public void move(ArrayList<GameElement> gameElementList) {
         if (isAlive()) {
             if (currentDirectionHasReached) {

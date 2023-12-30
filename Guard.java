@@ -16,6 +16,8 @@ public abstract class Guard extends Character {
 
         setDown();
     }
+
+    protected abstract void move(ArrayList<GameElement> gameElementList);
     
     // Si la position x;y n'est pas un mur ou un teleporter
     protected boolean isMoveOk(ArrayList<GameElement> gameElementList, int x, int y) {
@@ -23,6 +25,12 @@ public abstract class Guard extends Character {
             if (gameElement instanceof Wall || gameElement instanceof Teleporter) {
                 if (gameElement.getPosX() == x
                         && gameElement.getPosY() == y) {
+                    return false;
+                }
+            } else if (gameElement instanceof Teleporter) {
+                Teleporter tp = (Teleporter) gameElement;
+
+                if (tp.getPortal2X() == x && tp.getPortal2X() == y) {
                     return false;
                 }
             }
@@ -35,6 +43,7 @@ public abstract class Guard extends Character {
         setLocation(getX()+1, getY());
     }
 
+    public void unsetAlive() {isAlive = false;}
 
     public boolean isAlive() {return isAlive;}
 

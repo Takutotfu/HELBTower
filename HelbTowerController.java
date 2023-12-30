@@ -31,6 +31,8 @@ public class HelbTowerController {
     private static final int CROSS_OPENING = 5;
     private static final int TOWER_X = ROWS / 4;
     private static final int TOWER_Y = COLUMNS / 4;
+    private static final int NBR_OF_POTIONS = 6;
+    private static final int NBR_OF_CLOAK = 5;
 
     private int coinNbr;
     private int maxCaseForBlueGuard = 0;
@@ -47,9 +49,9 @@ public class HelbTowerController {
     public HelbTowerController(Stage primaryStage) {
         mainChar = new MainCharacter(ROWS / 2, COLUMNS / 4);
         orangeGuard = new OrangeGuard(TOWER_X, TOWER_Y);
-        blueGuard = new BlueGuard(ROWS - TOWER_X, TOWER_Y);
+        blueGuard = new BlueGuard(ROWS - TOWER_X, TOWER_Y, maxCaseForBlueGuard, ROWS, COLUMNS);
         purpleGuard = new PurpleGuard(ROWS - TOWER_X, COLUMNS - TOWER_Y, TOWER_X, TOWER_Y, ROWS, COLUMNS);
-        redGuard = new RedGuard(TOWER_X, COLUMNS - TOWER_Y);
+        redGuard = new RedGuard(TOWER_X, COLUMNS - TOWER_Y, mainChar);
         model = new HelbTowerModel(ROWS, COLUMNS, mainChar);
         view = new HelbTowerView(WIDTH, HEIGHT, ROWS, COLUMNS, SQUARE_SIZE);
 
@@ -70,6 +72,7 @@ public class HelbTowerController {
             @Override
             public void handle(KeyEvent event) {
                 KeyCode code = event.getCode();
+
                 if (model.isANewCycle(lastTimeKeyPressed, model.getDelay()) || model.isPotionEffect()) {
                     lastTimeKeyPressed = System.currentTimeMillis();
 
@@ -101,16 +104,49 @@ public class HelbTowerController {
                     System.out.println("x:" + mainChar.getX() + " ; y:" + mainChar.getY()); // DEBUG POSITION
                 }
 
+                // CHEAT CODES
+                if (code == KeyCode.DIGIT0) {
+                    System.out.println("Reset de la partie");
+                } else if (code == KeyCode.DIGIT1) {
+                    System.out.println("Party set on morning");
+                } else if (code == KeyCode.DIGIT2) {
+                    System.out.println("Party set on day");
+                } else if (code == KeyCode.DIGIT3) {
+                    System.out.println("Party set on night");
+                } else if (code == KeyCode.DIGIT4) {
+                    model.generatePotion();
+                } else if (code == KeyCode.DIGIT5) {
+                    model.generateCloak();
+                } else if (code == KeyCode.DIGIT6) {
+                    Guard newGuard = model.generateRandomGuard(maxCaseForBlueGuard);
+                    charactersArray.add(newGuard);
+                    System.out.println("Random guard generate: " + newGuard);
+                    
+                    Timeline newGuardTimeline = new Timeline(new KeyFrame(Duration.millis(model.getDelay()), e -> newGuard.move(model.getGameElementList())));
+                    newGuardTimeline.setCycleCount(Animation.INDEFINITE);
+                    newGuardTimeline.play();
+                } else if (code == KeyCode.R) {
+                    redGuard.unsetAlive();
+                } else if (code == KeyCode.B) {
+                    blueGuard.unsetAlive();
+                } else if (code == KeyCode.M) {
+                    purpleGuard.unsetAlive();
+                } else if (code == KeyCode.O) {
+                    orangeGuard.unsetAlive();
+                } else if (code == KeyCode.S) {
+                    System.out.println("Additional activated");
+                }
+
             }
         });
 
         model.generateBorder();
         model.generateWall(CROSS_OPENING);
         model.generateTower(TOWER_X, TOWER_Y);
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < NBR_OF_CLOAK; i++) {
             model.generateCloak();
         }
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < NBR_OF_POTIONS; i++) {
             model.generatePotion();
         }
         model.generateCoin();
@@ -170,8 +206,8 @@ public class HelbTowerController {
         if (model.isANewCycle(lastTimeGuardMove, model.getDelay())) {
             lastTimeGuardMove = System.currentTimeMillis();
             orangeGuard.move(model.getGameElementList());
-            blueGuard.move(model.getGameElementList(), ROWS, COLUMNS, maxCaseForBlueGuard);
-            redGuard.move(model.getGameElementList(), mainChar.getX(), mainChar.getY());
+            blueGuard.move(model.getGameElementList());
+            redGuard.move(model.getGameElementList());
         }
 
         if (model.isANewCycle(lastTimePurpleGuardMove, model.getPurpleDelay())) {

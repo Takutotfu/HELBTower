@@ -9,6 +9,7 @@ public class OrangeGuard extends Guard {
                                        "/img/orangeGuardDown.png" });
     }
 
+    @Override
     public void move(ArrayList<GameElement> gameElementList) {
         if (isAlive()) {
             int random = (int) (Math.random() * 4);
@@ -43,4 +44,5 @@ public class OrangeGuard extends Guard {
             }
         }
     }
+
 }

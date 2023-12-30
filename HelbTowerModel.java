@@ -8,7 +8,7 @@ public class HelbTowerModel {
 
     private boolean gameOver;
 
-    private Character mainChar;
+    private MainCharacter mainChar;
     private Teleporter portalBlue, portalRed;
 
     private int delay = 300; // 1000 = 1sec
@@ -30,7 +30,7 @@ public class HelbTowerModel {
     private ArrayList<GameElement> gameElementList = new ArrayList<GameElement>();
     //private Map<String, String> pathToImageMap = new HashMap<>();
 
-    public HelbTowerModel(int rows, int columns, Character mainChar) {
+    public HelbTowerModel(int rows, int columns, MainCharacter mainChar) {
         this.rows = rows;
         this.columns = columns;
         this.mainChar = mainChar;
@@ -39,7 +39,6 @@ public class HelbTowerModel {
         portalRed = new Teleporter(0, (columns-1)/2, rows-1, (columns-1)/2, 0);
         gameElementList.add(portalBlue);
         gameElementList.add(portalRed);
-
 
         //pathToImageMap.put(foodClassDescriptionString, pathToFoodImage);
         //System.out.println(portalBlue.getClass().getName() + " " + portalBlue.getPathToImage());
@@ -51,8 +50,8 @@ public class HelbTowerModel {
     public void generateCloak() {
         start:
         while (true) {
-            int randomXPos = (int) (Math.random() * rows);
-            int randomYPos = (int) (Math.random() * columns);
+            int randomXPos = (int) (Math.random() * rows-1);
+            int randomYPos = (int) (Math.random() * columns-1);
 
             for (GameElement gameElement : gameElementList) {
                 if (gameElement.getPosX() == randomXPos 
@@ -72,8 +71,8 @@ public class HelbTowerModel {
         start:
         while (true) {
             int randomPotion = (int) (Math.random() * 3);
-            int randomXPos = (int) (Math.random() * rows);
-            int randomYPos = (int) (Math.random() * columns);
+            int randomXPos = (int) (Math.random() * rows-1);
+            int randomYPos = (int) (Math.random() * columns-1);
 
             for (GameElement gameElement : gameElementList) {
                 if (gameElement.getPosX() == randomXPos 
@@ -161,6 +160,43 @@ public class HelbTowerModel {
                 gameElementList.add(new Wall(i,j));
             }
         }
+    }
+
+    public Guard generateRandomGuard(int maxCaseForBlueGuard) {
+        Guard newGuard;
+        int randomGuard = (int) (Math.random() * 4);
+
+        start: while (true) {
+            int randomPosX = (int) (Math.random() * rows);
+            int randomPosY = (int) (Math.random() * columns);
+
+            for (GameElement gameElement : gameElementList) {
+                if (gameElement instanceof Wall && gameElement.getPosX() == randomPosX
+                        && gameElement.getPosY() == randomPosY) {
+                    continue start;
+                }
+            }
+
+            switch (randomGuard) {
+                case 0:
+                    newGuard = new RedGuard(voidX, voidY, mainChar);
+                    break;
+                case 1:
+                    newGuard = new OrangeGuard(randomPosX, randomPosY);
+                    break;
+                case 2:
+                    newGuard = new BlueGuard(randomPosX, randomPosY, maxCaseForBlueGuard, rows, columns);
+                    break;
+                default:
+                    newGuard = new PurpleGuard(randomPosX, randomPosY, randomPosY, randomPosY, randomPosY, randomPosY);
+                    break;
+            }
+            newGuard.setAlive();
+            newGuard.setLocation(randomPosX, randomPosY);
+
+            return newGuard;
+        }
+
     }
 
     public void eatGameElement() {
