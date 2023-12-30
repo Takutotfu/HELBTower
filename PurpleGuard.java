@@ -6,17 +6,16 @@ public class PurpleGuard extends Guard {
     private ArrayList<Point> towersPosition = new ArrayList<>();
     private Point currentDirection;
 
-    public PurpleGuard() {
-        super(16, 12, new String[]{ "/img/purpleGuardLeft.png",
+    public PurpleGuard(int x, int y, int towerX, int towerY, int rows, int columns) {
+        super(x, y, new String[]{ "/img/purpleGuardLeft.png",
                                       "/img/purpleGuardRight.png",
                                       "/img/purpleGuardUp.png",
                                       "/img/purpleGuardDown.png" });
         
-        towersPosition.add(new Point(17, 1)); // top right tower 
-        towersPosition.add(new Point(3, 13)); // bottom left tower
-        towersPosition.add(new Point(17, 13)); // bottom right tower
-        towersPosition.add(new Point(3, 1)); // top left tower
-
+        towersPosition.add(new Point(towerX-2, towerY-2)); // top left tower
+        towersPosition.add(new Point(rows-towerX+1, towerY-2)); // top right tower 
+        towersPosition.add(new Point(x-2, columns-towerY)); // bottom left tower
+        towersPosition.add(new Point(x+1, columns-towerY)); // bottom right tower
     }
 
     public void move(ArrayList<GameElement> gameElementList) {

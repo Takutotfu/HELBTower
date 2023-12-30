@@ -6,15 +6,19 @@ public class BlueGuard extends Guard {
     private Point currentDirection;
     private boolean currentDirectionHasReached = true;
 
-    public BlueGuard() {
-        super(16, 3, new String[]{ "/img/blueGuardLeft.png",
+    public BlueGuard(int x, int y) {
+        super(x, y, new String[]{ "/img/blueGuardLeft.png",
                                       "/img/blueGuardRight.png",
                                       "/img/blueGuardUp.png",
                                       "/img/blueGuardDown.png" });
     }
 
-    public void move(ArrayList<GameElement> gameElementList, int rows, int columns) {
+    public void move(ArrayList<GameElement> gameElementList, int rows, int columns, int maxCase) {
         if (isAlive()) {
+            if (memoryPosition.size() == maxCase) {
+                memoryPosition.clear();
+            }
+
             if (currentDirectionHasReached) {
                 setRandomDirection(gameElementList, rows, columns);
             } else {

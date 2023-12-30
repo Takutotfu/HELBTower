@@ -36,6 +36,14 @@ public class HelbTowerView {
                 } else {
                     gameElemImgMap.put(gameElem.getClass().getName() + "Blue", new Image(gameElem.getPathToImage()));
                 }
+            } else if (gameElem instanceof Potion) {
+                if (((Potion) gameElem).getColor().equals("Red")) {
+                    gameElemImgMap.put(gameElem.getClass().getName() + "Red", new Image(gameElem.getPathToImage()));
+                } else if (((Potion) gameElem).getColor().equals("Orange")) {
+                    gameElemImgMap.put(gameElem.getClass().getName() + "Orange", new Image(gameElem.getPathToImage()));
+                } else {
+                    gameElemImgMap.put(gameElem.getClass().getName() + "Yellow", new Image(gameElem.getPathToImage()));
+                }
             }
             gameElemImgMap.put(gameElem.getClass().getName(), new Image(gameElem.getPathToImage()));
         }
@@ -122,7 +130,7 @@ public class HelbTowerView {
         for (GameElement gameElem : gameElementList) {
             if (gameElem instanceof Teleporter) {
                 Teleporter teleporter = (Teleporter) gameElem;
-                String color = teleporter.getColor().equals("Red") ? "Red" : "Blue";
+                String color = teleporter.getColor();
                 gc.drawImage(gameElemImgMap.get(teleporter.getClass().getName() + color),
                         teleporter.getPosX() * squareSize,
                         teleporter.getPosY() * squareSize,
@@ -134,6 +142,14 @@ public class HelbTowerView {
                         squareSize,
                         squareSize);
                 
+            } else if (gameElem instanceof Potion) {
+                Potion potion = (Potion) gameElem;
+                String color = potion.getColor();
+                gc.drawImage(gameElemImgMap.get(potion.getClass().getName() + color),
+                        potion.getPosX() * squareSize,
+                        potion.getPosY() * squareSize,
+                        squareSize,
+                        squareSize);
             } else {
                 gc.drawImage(gameElemImgMap.get(gameElem.getClass().getName()),
                         gameElem.getPosX() * squareSize,

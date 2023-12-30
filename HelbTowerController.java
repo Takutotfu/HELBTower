@@ -22,15 +22,26 @@ public class HelbTowerController {
     private BlueGuard blueGuard;
     private PurpleGuard purpleGuard;
     private RedGuard redGuard;
-    
+
     private static final int WIDTH = 1050;
     private static final int HEIGHT = 750;
     private static final int ROWS = 21;
     private static final int COLUMNS = 15;
     private static final int SQUARE_SIZE = WIDTH / ROWS;
     private static final int CROSS_OPENING = 5;
+    private static final int TOWER_X = ROWS / 4;
+    private static final int TOWER_Y = COLUMNS / 4;
 
     private int coinNbr;
+    private int maxCaseForBlueGuard = 0;
+    private int potionCooldown = 0;
+
+    private long lastTimeKeyPressed = System.currentTimeMillis();
+    private long lastTimeGuardMove = System.currentTimeMillis();
+    private long lastTimePurpleGuardMove = System.currentTimeMillis();
+    private long lastTimePotionTaked;
+
+    private boolean isPotionEffect = false;
 
     private GraphicsContext gc;
 
@@ -38,11 +49,11 @@ public class HelbTowerController {
     private HashMap<String, String> charactersPathMap = new HashMap<>();
 
     public HelbTowerController(Stage primaryStage) {
-        mainChar = new MainCharacter(ROWS/2, COLUMNS/4);
-        orangeGuard = new OrangeGuard();
-        blueGuard = new BlueGuard();
-        purpleGuard = new PurpleGuard();
-        redGuard = new RedGuard();
+        mainChar = new MainCharacter(ROWS / 2, COLUMNS / 4);
+        orangeGuard = new OrangeGuard(TOWER_X, TOWER_Y);
+        blueGuard = new BlueGuard(ROWS - TOWER_X, TOWER_Y);
+        purpleGuard = new PurpleGuard(ROWS - TOWER_X, COLUMNS - TOWER_Y, TOWER_X, TOWER_Y, ROWS, COLUMNS);
+        redGuard = new RedGuard(TOWER_X, COLUMNS - TOWER_Y);
         model = new HelbTowerModel(ROWS, COLUMNS, mainChar);
         view = new HelbTowerView(WIDTH, HEIGHT, ROWS, COLUMNS, SQUARE_SIZE);
 
@@ -63,39 +74,52 @@ public class HelbTowerController {
             @Override
             public void handle(KeyEvent event) {
                 KeyCode code = event.getCode();
-                if (code == KeyCode.RIGHT || code == KeyCode.D) {
-                    mainChar.setRight();
-                    if (mainChar.isNextCaseIsAvaible(model.getGameElementList())) {
-                        mainChar.moveRight();
+                if (model.isANewCycle(lastTimeKeyPressed, model.getDelay()) || isPotionEffect) {
+                    lastTimeKeyPressed = System.currentTimeMillis();
+
+                    if (code == KeyCode.RIGHT || code == KeyCode.D) {
+                        mainChar.setRight();
+                        if (mainChar.isNextCaseIsAvaible(model.getGameElementList())) {
+                            mainChar.moveRight();
+                        }
+                    } else if (code == KeyCode.LEFT || code == KeyCode.Q) {
+                        mainChar.setLeft();
+                        if (mainChar.isNextCaseIsAvaible(model.getGameElementList())) {
+                            mainChar.moveLeft();
+                        }
+                    } else if (code == KeyCode.UP || code == KeyCode.Z) {
+                        mainChar.setUp();
+                        if (mainChar.isNextCaseIsAvaible(model.getGameElementList())) {
+                            mainChar.moveUp();
+                        }
+                    } else if (code == KeyCode.DOWN || code == KeyCode.S) {
+                        mainChar.setDown();
+                        if (mainChar.isNextCaseIsAvaible(model.getGameElementList())) {
+                            mainChar.moveDown();
+                        }
                     }
-                } else if (code == KeyCode.LEFT || code == KeyCode.Q) {
-                    mainChar.setLeft();
-                    if (mainChar.isNextCaseIsAvaible(model.getGameElementList())) {
-                        mainChar.moveLeft();
-                    }
-                } else if (code == KeyCode.UP || code == KeyCode.Z) {
-                    mainChar.setUp();
-                    if (mainChar.isNextCaseIsAvaible(model.getGameElementList())) {
-                        mainChar.moveUp();
-                    }
-                } else if (code == KeyCode.DOWN || code == KeyCode.S) {
-                    mainChar.setDown();
-                    if (mainChar.isNextCaseIsAvaible(model.getGameElementList())) {
-                        mainChar.moveDown();
-                    }
+                    System.out.println("x:" + mainChar.getX() + " ; y:" + mainChar.getY()); // DEBUG POSITION
+
                 }
-                System.out.println("x:" + mainChar.getX() + " ; y:" + mainChar.getY()); // DEBUG POSITION
             }
         });
 
         model.generateBorder();
         model.generateWall(CROSS_OPENING);
-        model.generateTower();
-        model.generateFood();
+        model.generateTower(TOWER_X, TOWER_Y);
+        for (int i = 0; i < 6; i++) {
+            model.generatePotion();
+        }
         model.generateCoin();
 
         coinNbr = model.getCoinCounter();
-        
+
+        for (GameElement gameElem : model.getGameElementList()) {
+            if (!(gameElem instanceof Wall)) {
+                maxCaseForBlueGuard++;
+            }
+        }
+
         charactersArray.add(mainChar);
         charactersArray.add(orangeGuard);
         charactersArray.add(blueGuard);
@@ -108,17 +132,15 @@ public class HelbTowerController {
         charactersPathMap.putAll(purpleGuard.getCharSkinMap());
         charactersPathMap.putAll(redGuard.getCharSkinMap());
 
-
-        view.convertPathToImage(model.getGameElementList(), 
-                                charactersArray,
-                                charactersPathMap);
-        
+        view.convertPathToImage(model.getGameElementList(),
+                charactersArray,
+                charactersPathMap);
 
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(20), e -> run(gc)));
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
     }
-    
+
     private void run(GraphicsContext gc) {
         // Views
         if (model.getGameOver()) {
@@ -133,37 +155,56 @@ public class HelbTowerController {
         view.drawScore(model.getScore(), model.getCoinCounter(), gc);
 
         // Models
-        model.eatFood();
+        model.drinkPotion();
+
+        for (Potion potion : model.getPotionList()) {
+            if (potion.isTaked()) {
+                lastTimePotionTaked = System.currentTimeMillis();
+                isPotionEffect = true;
+                potionCooldown = potion.getDuration();
+            }
+            potion.unsetTaked();
+        }
+
+        if (model.isANewCycle(lastTimePotionTaked, potionCooldown)) {
+            isPotionEffect = false;
+        }
+
         model.eatCoin();
-        
+
         if (is25percentCoinsTaked()) {
             orangeGuard.setAlive();
             blueGuard.setAlive();
             purpleGuard.setAlive();
             redGuard.setAlive();
         }
-        
-        if (model.isANewCycle()) {
+
+        if (model.isANewCycle(lastTimeGuardMove, model.getDelay())) {
+            lastTimeGuardMove = System.currentTimeMillis();
             orangeGuard.move(model.getGameElementList());
-            blueGuard.move(model.getGameElementList(), ROWS, COLUMNS);
-            purpleGuard.move(model.getGameElementList());
+            blueGuard.move(model.getGameElementList(), ROWS, COLUMNS, maxCaseForBlueGuard);
             redGuard.move(model.getGameElementList(), mainChar.getX(), mainChar.getY());
+        }
+
+        if (model.isANewCycle(lastTimePurpleGuardMove, model.getPurpleDelay())) {
+            lastTimePurpleGuardMove = System.currentTimeMillis();
+            purpleGuard.move(model.getGameElementList());
         }
 
         model.triggerPortal(mainChar);
 
-        //mainChar.isKillByGuards(charactersArray);
+        // mainChar.isKillByGuards(charactersArray);
 
         if (!(mainChar.isAlive())) {
             model.setGameOver();
         }
     }
-    
+
     public boolean is25percentCoinsTaked() {
-        return model.getCoinCounter() == (int) (coinNbr * 0.75) && !( (orangeGuard.isAlive()) && 
-                                                                      (blueGuard.isAlive()) &&
-                                                                      (purpleGuard.isAlive()) &&
-                                                                      (redGuard.isAlive()) );
+        return model.getCoinCounter() == (int) (coinNbr * 0.75) && !((orangeGuard.isAlive()) &&
+                (blueGuard.isAlive()) &&
+                (purpleGuard.isAlive()) &&
+                (redGuard.isAlive()));
     }
 
 }

@@ -2,8 +2,8 @@ import java.util.ArrayList;
 
 public class OrangeGuard extends Guard {
 
-    public OrangeGuard() {
-        super(5, 3, new String[] { "/img/orangeGuardLeft.png",
+    public OrangeGuard(int x, int y) {
+        super(x, y, new String[] { "/img/orangeGuardLeft.png",
                                        "/img/orangeGuardRight.png",
                                        "/img/orangeGuardUp.png",
                                        "/img/orangeGuardDown.png" });

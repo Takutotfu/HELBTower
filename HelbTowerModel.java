@@ -11,17 +11,17 @@ public class HelbTowerModel {
     private Character mainChar;
     private Teleporter portalBlue, portalRed;
 
-    private int delay = 1000; // 1sec
-    private long tmpTime = System.currentTimeMillis();
+    private int delay = 300; // 1000 = 1sec
+    private int purpleDelay = 300;
 
     private int score;
     private int coinCounter = 0;
-    private Food food = new Food(voidX, voidY);
 
     //private String foodClassDescriptionString = food.getClass().getName();
     //private String pathToFoodImage = food.getPathToImage();
 
     private ArrayList<Coin> coinList = new ArrayList<Coin>();
+    private ArrayList<Potion> potionList = new ArrayList<Potion>();
     private ArrayList<GameElement> gameElementList = new ArrayList<GameElement>();
     //private Map<String, String> pathToImageMap = new HashMap<>();
 
@@ -35,7 +35,6 @@ public class HelbTowerModel {
         gameElementList.add(portalBlue);
         gameElementList.add(portalRed);
 
-        gameElementList.add(food);
 
         //pathToImageMap.put(foodClassDescriptionString, pathToFoodImage);
         //System.out.println(portalBlue.getClass().getName() + " " + portalBlue.getPathToImage());
@@ -44,9 +43,10 @@ public class HelbTowerModel {
         //pathToImageMap.put(portalRed.getClass().getName()+"Red", portalRed.getPathToImage());
     }
 
-    public void generateFood() {
+    public void generatePotion() {
         start:
         while (true) {
+            int randomPotion = (int) (Math.random() * 3);
             int randomXPos = (int) (Math.random() * rows);
             int randomYPos = (int) (Math.random() * columns);
 
@@ -56,10 +56,11 @@ public class HelbTowerModel {
                     continue start;
                 }
             }
-            
-            food.setPosX(randomXPos);
-            food.setPosY(randomYPos);
-            food.setFoodImage();
+
+            Potion newPotion = new Potion(randomXPos, randomYPos, randomPotion);
+            potionList.add(newPotion);
+            gameElementList.add(newPotion);
+
             //pathToFoodImage = food.getPathToImage();
             //pathToImageMap.put(foodClassDescriptionString, pathToFoodImage);
             break;
@@ -108,49 +109,50 @@ public class HelbTowerModel {
         }
     }
 
-    public void generateTower() {
+    public void generateTower(int towerX, int towerY) {
         // top left tower
-        for (int i = (rows/4)-1; i <= rows/4; i++) {
-            for (int j = (columns/4)-1; j <= (columns/4); j++) {
+        for (int i = towerX-1; i <= towerX; i++) {
+            for (int j = towerY-1; j <= towerY; j++) {
                 gameElementList.add(new Wall(i,j));
             }
         }
 
         // top right tower
-        for (int i = rows-(rows/4)-1; i <= rows-(rows/4); i++) {
-            for (int j = (columns/4)-1; j <= (columns/4); j++) {
+        for (int i = rows-towerX-1; i <= rows-towerX; i++) {
+            for (int j = towerY-1; j <= towerY; j++) {
                 gameElementList.add(new Wall(i,j));
             }
         }
 
         // Bottom left tower
-        for (int i = (rows/4)-1; i <= rows/4; i++) {
-            for (int j = columns-(columns/4)-1; j <= columns-(columns/4); j++) {
+        for (int i = towerX-1; i <= towerX; i++) {
+            for (int j = columns-towerY-1; j <= columns-towerY; j++) {
                 gameElementList.add(new Wall(i,j));
             }
         }
 
         // Bottom right tower
-        for (int i = rows-(rows/4)-1; i <= rows-(rows/4); i++) {
-            for (int j = columns-(columns/4)-1; j <= columns-(columns/4); j++) {
+        for (int i = rows-towerX-1; i <= rows-towerX; i++) {
+            for (int j = columns-towerY-1; j <= columns-towerY; j++) {
                 gameElementList.add(new Wall(i,j));
             }
         }
     }
 
-    public void eatFood() {
-        if (mainChar.getX() == food.getPosX() && mainChar.getY() == food.getPosY()) {
-            food.triggerAction(this);
-            delay -= 100;
-            System.out.println(delay);
-        }
-
-    }
     
     public void eatCoin() {
         for (Coin coin : coinList) {
             if (mainChar.getX() == coin.getPosX() && mainChar.getY() == coin.getPosY()) {
                 coin.triggerAction(this);
+                purpleDelay -= 3;
+            }
+        }
+    }
+
+    public void drinkPotion() {
+        for (Potion potion : potionList) {
+            if (mainChar.getX() == potion.getPosX() && mainChar.getY() == potion.getPosY()) {
+                potion.triggerAction(this);
             }
         }
     }
@@ -169,12 +171,8 @@ public class HelbTowerModel {
         }
     }
 
-    public boolean isANewCycle() {
-        if (System.currentTimeMillis() >= (tmpTime + delay)) {
-            tmpTime = System.currentTimeMillis();
-            return true;
-        }
-        return false;
+    public boolean isANewCycle(long time, int delay) {
+        return System.currentTimeMillis() >= (time + delay);
     }
 
     public boolean isGameElemInCase(int x, int y) {
@@ -190,6 +188,10 @@ public class HelbTowerModel {
 
     // GET & SET
     public void setDelay(int newDelay) {delay = newDelay;}
+
+    public int getDelay() {return delay;}
+
+    public int getPurpleDelay() {return purpleDelay;}
 
     public int getScore(){return score;}
     
@@ -208,6 +210,8 @@ public class HelbTowerModel {
     public int getVoidY(){return voidY;}
 
     public ArrayList<GameElement> getGameElementList() {return gameElementList;}
+
+    public ArrayList<Potion> getPotionList() {return potionList;}
 
     //public Map<String, String> getPathToImageMap() {return pathToImageMap;}
 
