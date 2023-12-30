@@ -1,17 +1,21 @@
 import java.util.ArrayList;
 
 public class HelbTowerModel {
+    private int period;
+
     private int rows;
     private int columns;
     private int voidX = -2;
     private int voidY = -2;
 
     private boolean gameOver;
+    private boolean levelFinished;
 
     private MainCharacter mainChar;
     private Teleporter portalBlue, portalRed;
 
-    private int delay = 300; // 1000 = 1sec
+    private int mainChardelay = 300; // 1000 = 1sec
+    private int guardDelay = 300;
     private int purpleDelay = 300;
 
     private boolean isWearingCloak = false;
@@ -23,29 +27,16 @@ public class HelbTowerModel {
     private int score;
     private int coinCounter = 0;
 
-    //private String foodClassDescriptionString = food.getClass().getName();
-    //private String pathToFoodImage = food.getPathToImage();
-
     private ArrayList<Coin> coinList = new ArrayList<Coin>();
     private ArrayList<GameElement> gameElementList = new ArrayList<GameElement>();
-    //private Map<String, String> pathToImageMap = new HashMap<>();
 
-    public HelbTowerModel(int rows, int columns, MainCharacter mainChar) {
+    public HelbTowerModel(int rows, int columns, int period, MainCharacter mainChar) {
         this.rows = rows;
         this.columns = columns;
+        this.period = period;
         this.mainChar = mainChar;
-
-        portalBlue = new Teleporter((rows-1)/2, 0, (rows-1)/2, columns-1, 1);
-        portalRed = new Teleporter(0, (columns-1)/2, rows-1, (columns-1)/2, 0);
-        gameElementList.add(portalBlue);
-        gameElementList.add(portalRed);
-
-        //pathToImageMap.put(foodClassDescriptionString, pathToFoodImage);
-        //System.out.println(portalBlue.getClass().getName() + " " + portalBlue.getPathToImage());
-        //pathToImageMap.put(portalBlue.getClass().getName()+"Blue", portalBlue.getPathToImage());
-        //System.out.println(portalRed.getClass().getName() + " " + portalRed.getPathToImage());
-        //pathToImageMap.put(portalRed.getClass().getName()+"Red", portalRed.getPathToImage());
     }
+
 
     public void generateCloak() {
         start:
@@ -83,14 +74,12 @@ public class HelbTowerModel {
 
             Potion newPotion = new Potion(randomXPos, randomYPos, randomPotion);
             gameElementList.add(newPotion);
-
-            //pathToFoodImage = food.getPathToImage();
-            //pathToImageMap.put(foodClassDescriptionString, pathToFoodImage);
             break;
         }
     }
     
     public void generateCoin() {
+        coinCounter = 0;
         for (int i = 0; i < rows - 1; i++) {
             for (int j = 0; j < columns - 1; j++) {
                 if (!(isGameElemInCase(i, j))) {
@@ -117,6 +106,13 @@ public class HelbTowerModel {
                 gameElementList.add(new Wall(rows - 1, i)); // right border                
             }
         }
+    }
+
+    public void generateTeleporter() {
+        portalBlue = new Teleporter((rows-1)/2, 0, (rows-1)/2, columns-1, 1);
+        portalRed = new Teleporter(0, (columns-1)/2, rows-1, (columns-1)/2, 0);
+        gameElementList.add(portalBlue);
+        gameElementList.add(portalRed);
     }
 
     public void generateWall(int crossOpening) {
@@ -269,9 +265,15 @@ public class HelbTowerModel {
     
 
     // GET & SET
-    public void setDelay(int newDelay) {delay = newDelay;}
+    public int getPeriod() {return period;}
 
-    public int getDelay() {return delay;}
+    public void setPeriod(int period) {this.period = period;}
+
+    public void setGuardDelay(int newDelay) {guardDelay = newDelay;}
+
+    public int getGuardDelay() {return guardDelay;}
+
+    public int getMainCharDelay() {return mainChardelay;}
 
     public int getPurpleDelay() {return purpleDelay;}
 
@@ -286,6 +288,12 @@ public class HelbTowerModel {
     public int getCoinCounter(){return coinCounter;}
     
     public void decreaseCoinCounter(){coinCounter--;}
+
+    public void unsetLevelFinished(){levelFinished = false;}
+
+    public void setLevelFinished(){levelFinished = true;}
+
+    public boolean getLevelFinished() {return levelFinished;}
     
     public void setGameOver(){gameOver = true;}
 
@@ -296,8 +304,6 @@ public class HelbTowerModel {
     public int getVoidY(){return voidY;}
 
     public ArrayList<GameElement> getGameElementList() {return gameElementList;}
-
-    //public Map<String, String> getPathToImageMap() {return pathToImageMap;}
 
     public Teleporter getPortalRed() {return portalRed;}
 

@@ -10,8 +10,13 @@ import javafx.scene.text.Font;
 public class HelbTowerView {
     private int width, height, rows, columns, squareSize;
 
-    private Image grassTexture = new Image("img/grass.png");
-    private Image grass2Texture = new Image("img/grass2.png");
+    private Image grassMorningTexture = new Image("/img/grassMorning.png");
+    private Image grass2MorningTexture = new Image("/img/grass2Morning.png");
+    private Image grassTexture = new Image("/img/grass.png");
+    private Image grass2Texture = new Image("/img/grass2.png");
+    private Image grassNightTexture = new Image("/img/grassNight.png");
+    private Image grass2NightTexture = new Image("/img/grass2Night.png");
+
 
     private Image currentSkin;
     private Map<String, Image> gameElemImgMap = new HashMap<>();
@@ -83,15 +88,27 @@ public class HelbTowerView {
         return;
     }
 
-    public void drawBackground(GraphicsContext gc) {
+    public void drawBackground(int period, GraphicsContext gc) {
         Image currentImage;
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 if ((i + j) % 2 == 0) {
-                    currentImage = grassTexture;
+                    if (period == 0) {
+                        currentImage = grassMorningTexture;
+                    } else if (period == 1) {
+                        currentImage = grassTexture;
+                    } else {
+                        currentImage = grassNightTexture;
+                    }
                 } else {
-                    currentImage = grass2Texture;
+                    if (period == 0) {
+                        currentImage = grass2MorningTexture;
+                    } else if (period == 1) {
+                        currentImage = grass2Texture;
+                    } else {
+                        currentImage = grass2NightTexture;
+                    }
                 }
                 gc.drawImage(currentImage, i * squareSize, j * squareSize, squareSize, squareSize);
             }

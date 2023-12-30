@@ -7,12 +7,13 @@ public class Coin extends GameElement {
     @Override
     public void triggerAction(HelbTowerModel gameBoard) {
         gameBoard.decreaseCoinCounter();
-        /*
+        
         if (gameBoard.getCoinCounter() == 0){
-            gameBoard.setGameOver();
+            gameBoard.setLevelFinished();
         }
-        */
-        setPosX(gameBoard.getVoidX()) ; 
-        setPosY(gameBoard.getVoidY()) ;
+
+        setPosX(gameBoard.getVoidX()); 
+        setPosY(gameBoard.getVoidY());
+        gameBoard.setScore(gameBoard.getScore()+1);
     }
 }
