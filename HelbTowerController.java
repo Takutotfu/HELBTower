@@ -197,6 +197,7 @@ public class HelbTowerController {
 
         // Models
         if (model.getLevelFinished()) {
+            timeline.stop();
             initGame();
             model.setGuardDelay(model.getGuardDelay()-10);
             model.unsetLevelFinished();
