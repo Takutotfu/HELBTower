@@ -15,6 +15,8 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class HelbTowerController {
+    private Timeline timeline;
+
     private HelbTowerModel model;
     private HelbTowerView view;
     private MainCharacter mainChar;
@@ -52,6 +54,7 @@ public class HelbTowerController {
     private GraphicsContext gc;
 
     private ArrayList<Character> charactersArray = new ArrayList<>();
+    private ArrayList<Character> cheatedGuard = new ArrayList<>();
     private HashMap<String, String> charactersPathMap = new HashMap<>();
 
     public HelbTowerController(Stage primaryStage) {
@@ -135,6 +138,7 @@ public class HelbTowerController {
                     model.generateCloak();
                 } else if (code == KeyCode.DIGIT6) {
                     Guard newGuard = model.generateRandomGuard(maxCaseForBlueGuard);
+                    cheatedGuard.add(newGuard);
                     charactersArray.add(newGuard);
                     System.out.println("Random guard generate: " + newGuard);
                     
@@ -156,6 +160,12 @@ public class HelbTowerController {
             }
         });
 
+        charactersPathMap.putAll(mainChar.getCharSkinMap());
+        charactersPathMap.putAll(orangeGuard.getCharSkinMap());
+        charactersPathMap.putAll(blueGuard.getCharSkinMap());
+        charactersPathMap.putAll(purpleGuard.getCharSkinMap());
+        charactersPathMap.putAll(redGuard.getCharSkinMap());
+        
         initGame();
 
         coinNbr = model.getCoinCounter();
@@ -165,32 +175,17 @@ public class HelbTowerController {
                 maxCaseForBlueGuard++;
             }
         }
-
-        charactersArray.add(mainChar);
-        charactersArray.add(orangeGuard);
-        charactersArray.add(blueGuard);
-        charactersArray.add(purpleGuard);
-        charactersArray.add(redGuard);
-
-        charactersPathMap.putAll(mainChar.getCharSkinMap());
-        charactersPathMap.putAll(orangeGuard.getCharSkinMap());
-        charactersPathMap.putAll(blueGuard.getCharSkinMap());
-        charactersPathMap.putAll(purpleGuard.getCharSkinMap());
-        charactersPathMap.putAll(redGuard.getCharSkinMap());
-
-        view.convertPathToImage(model.getGameElementList(),
-                charactersArray,
-                charactersPathMap);
-
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(20), e -> run(gc)));
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
     }
 
     private void run(GraphicsContext gc) {
         // Views
         if (model.getGameOver()) {
+            if (model.getScore() > model.getBestScore()) {
+                model.setBestScore(model.getScore());
+                model.writeBestScore();
+            }
             view.drawGameOver(gc);
+            timeline.stop();
             return;
         }
 
@@ -198,7 +193,7 @@ public class HelbTowerController {
         view.drawGameElements(model.getGameElementList(), gc);
 
         view.drawChar(charactersArray, gc);
-        view.drawScore(model.getScore(), model.getCoinCounter(), gc);
+        view.drawScore(model.getScore(), model.getCoinCounter(), model.getBestScore(), gc);
 
         // Models
         if (model.getLevelFinished()) {
@@ -230,7 +225,7 @@ public class HelbTowerController {
 
         model.triggerPortal(mainChar);
 
-        // mainChar.isKillByGuards(charactersArray);
+        mainChar.isKillByGuards(charactersArray);
 
         if (!(mainChar.isAlive())) {
             model.setGameOver();
@@ -238,9 +233,25 @@ public class HelbTowerController {
     }
 
     public void initGame() {
+
+        // On désactive le  Game over
+        model.unsetGameOver();
+
+        // On vide l'array des characters
+        charactersArray.clear();
+
+        // On rempli l'array des characters
+        charactersArray.add(mainChar);
+        charactersArray.add(orangeGuard);
+        charactersArray.add(blueGuard);
+        charactersArray.add(purpleGuard);
+        charactersArray.add(redGuard);
+
+        // On vide la list des games elements
         model.getGameElementList().clear();
 
         // Reset du Hero
+        mainChar.setAlive();
         mainChar.setLocation(ROWS / 2, COLUMNS / 4);
         
         // reset des structures
@@ -279,8 +290,21 @@ public class HelbTowerController {
             model.generateCloak();
         }
 
+        // Lire le dernier best score enregistré
+        model.readBestScore();
+
         // generation des coins
         model.generateCoin();
+
+        // conversion des path en image dans la view
+        view.convertPathToImage(model.getGameElementList(),
+                                charactersArray,
+                                charactersPathMap);
+
+        // Remise en place de la timeline
+        timeline = new Timeline(new KeyFrame(Duration.millis(20), e -> run(gc)));
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
     }
 
     public boolean is25percentCoinsTaked() {

@@ -1,4 +1,9 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class HelbTowerModel {
     private int period;
@@ -25,6 +30,7 @@ public class HelbTowerModel {
     private int potionCooldown = 0;
 
     private int score;
+    private int bestScore;
     private int coinCounter = 0;
 
     private ArrayList<Coin> coinList = new ArrayList<Coin>();
@@ -245,6 +251,33 @@ public class HelbTowerModel {
         }
     }
 
+    public void writeBestScore() {
+        try {
+            String save = String.valueOf(bestScore);
+            FileWriter myWriter = new FileWriter("best_score");
+            myWriter.write(save);
+            myWriter.close();
+        } catch (IOException e) {
+            System.out.println("Best score hasn't been write correctly");
+            e.printStackTrace();
+        }
+    }
+
+    public void readBestScore() {
+        try {
+            File myFile = new File("best_score");
+            Scanner sc = new Scanner(myFile);
+            while (sc.hasNextLine()) {
+                String data = sc.nextLine();
+                bestScore = Integer.parseInt(data);
+            }
+            sc.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("Best score hasn't been read correctly");
+            e.printStackTrace();
+        }
+    }
+
     public boolean isEffectFinish(long lastTimeTaked, int cooldown) {
         return System.currentTimeMillis() >= (lastTimeTaked + cooldown);
     }
@@ -262,9 +295,12 @@ public class HelbTowerModel {
         }
         return false;
     }
-    
 
     // GET & SET
+    public int getBestScore() {return bestScore;}
+
+    public void setBestScore(int score) {bestScore = score;}
+
     public int getPeriod() {return period;}
 
     public void setPeriod(int period) {this.period = period;}
@@ -294,6 +330,8 @@ public class HelbTowerModel {
     public void setLevelFinished(){levelFinished = true;}
 
     public boolean getLevelFinished() {return levelFinished;}
+
+    public void unsetGameOver(){gameOver = false;}
     
     public void setGameOver(){gameOver = true;}
 

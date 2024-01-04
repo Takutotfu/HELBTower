@@ -136,10 +136,11 @@ public class HelbTowerView {
         }
     }
 
-    public void drawScore(int score, int coinCounter, GraphicsContext gc) {
+    public void drawScore(int score, int coinCounter, int bestScore, GraphicsContext gc) {
         gc.setFill(Color.YELLOW);
         gc.setFont(new Font("IMPACT", 20));
         gc.fillText("Score: " + score, 10, 20);
+        gc.fillText("Best score: " + bestScore, 200, 20);
         gc.fillText("Coin: " + coinCounter, width - 100, 20);
     }
 

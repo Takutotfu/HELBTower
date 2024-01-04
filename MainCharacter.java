@@ -34,4 +34,6 @@ public class MainCharacter extends Character {
     }
 
     public Map<String, String> getCharSkinMap() {return charSkinMap;}
+
+    public void setAlive() {isAlive=true;}
 }
