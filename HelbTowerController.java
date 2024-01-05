@@ -55,6 +55,7 @@ public class HelbTowerController {
     private GraphicsContext gc;
 
     private boolean isAdditionalActivated = false;
+    private boolean isReset = false;
 
     private ArrayList<Character> charactersArray = new ArrayList<>();
     private ArrayList<Character> cheatedGuard = new ArrayList<>();
@@ -129,6 +130,7 @@ public class HelbTowerController {
 
                 // CHEAT CODES
                 if (code == KeyCode.DIGIT0 || code == KeyCode.NUMPAD0) {
+                    isReset = true;
                     initGame();
                     model.setScore(0);
                     System.out.println("Game reset");
@@ -245,12 +247,29 @@ public class HelbTowerController {
     }
 
     public void initGame() {
+        if (isReset) {
+            // On désactive le Game over
+            model.unsetGameOver();
 
-        // On désactive le  Game over
-        model.unsetGameOver();
+            // On vide l'array des characters
+            charactersArray.clear();
 
-        // On vide l'array des characters
-        charactersArray.clear();
+            // Réinitialisation du Hero
+            mainChar.setAlive();
+            mainChar.setLocation(ROWS / 2, COLUMNS / 4);
+            mainChar.setDown();
+
+            // Réinitialisation des gardes
+            orangeGuard = new OrangeGuard(TOWER_X, TOWER_Y);
+            blueGuard = new BlueGuard(ROWS - TOWER_X, TOWER_Y, ROWS, COLUMNS);
+            purpleGuard = new PurpleGuard(ROWS - TOWER_X, COLUMNS - TOWER_Y, TOWER_X, TOWER_Y, ROWS, COLUMNS);
+            redGuard = new RedGuard(TOWER_X, COLUMNS - TOWER_Y, mainChar);
+
+            // On vide la list des gameElements
+            model.getGameElementList().clear();
+
+            isReset = false;
+        }
 
         // On rempli l'array des characters
         charactersArray.add(mainChar);
@@ -259,27 +278,13 @@ public class HelbTowerController {
         charactersArray.add(purpleGuard);
         charactersArray.add(redGuard);
 
-        // On vide la list des games elements
-        model.getGameElementList().clear();
-
-        // Reset du Hero
-        mainChar.getMemoryPostion().clear();
-        mainChar.setAlive();
-        mainChar.setLocation(ROWS / 2, COLUMNS / 4);
-        
-        // reset des structures
+        // Génération des structures
         model.generateTeleporter();
         model.generateBorder();
         model.generateWall(CROSS_OPENING);
         model.generateTower(TOWER_X, TOWER_Y);
 
-        // reset des guards
-        resetGuard(orangeGuard, TOWER_X, TOWER_Y);
-        resetGuard(blueGuard, ROWS - TOWER_X, TOWER_Y);
-        resetGuard(redGuard, TOWER_X, COLUMNS - TOWER_Y);
-        resetGuard(purpleGuard, ROWS - TOWER_X, COLUMNS - TOWER_Y);
-        
-        // regeneration des potion
+        // Génération des potion
         for (int i = 0; i < NBR_OF_POTIONS; i++) {
             model.generatePotion();
         }
@@ -289,36 +294,32 @@ public class HelbTowerController {
             model.generateCloak();
         }
 
-        // generation des chronometre si activé
+        // génération des chronometre si activé
         if (isAdditionalActivated) {
             for (int i = 0; i < NBR_OF_CHRONOMETER; i++) {
                 model.generateChronometer();
             }
         }
 
-        // Lire le dernier best score enregistré
-        model.readBestScore();
-
         // generation des coins
         model.generateCoin();
 
-        // conversion des path en image dans la view
-        view.loadPaths(model.getGameElementList(),
-                                charactersArray,
-                                charactersPathMap);
+        // Lire le dernier best score enregistré
+        model.readBestScore();
 
-        // Remise en place de la timeline
+        if (!isReset) {
+            // Chargement des paths dans la view
+            view.loadPaths(model.getGameElementList(),
+                           charactersArray,
+                           charactersPathMap);
+        }
+
+        // Mise en route de la timeline
         timeline = new Timeline(new KeyFrame(Duration.millis(20), e -> run(gc)));
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
     }
     
-    private void resetGuard(Guard guard, int x, int y) {
-        guard.unsetAlive();
-        guard.setLocation(x, y);
-        guard.setDown();
-    }
-
     public boolean is25percentCoinsTaked() {
         return model.getCoinCounter() == (int) (coinNbr * 0.75) && !((orangeGuard.isAlive()) &&
                 (blueGuard.isAlive()) &&

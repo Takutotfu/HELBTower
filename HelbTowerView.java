@@ -144,7 +144,7 @@ public class HelbTowerView {
                         potion.getPosX(),
                         potion.getPosY());
             } else {
-                drawImage(gc, gameElemPathMap.get(gameElem.getClass().getName()),
+                drawImage(gc, gameElem.getPathToImage(),
                         gameElem.getPosX(),
                         gameElem.getPosY());
             }
