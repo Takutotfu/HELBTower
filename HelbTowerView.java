@@ -10,17 +10,18 @@ import javafx.scene.text.Font;
 public class HelbTowerView {
     private int width, height, rows, columns, squareSize;
 
-    private Image grassMorningTexture = new Image("/img/grassMorning.png");
-    private Image grass2MorningTexture = new Image("/img/grass2Morning.png");
-    private Image grassTexture = new Image("/img/grass.png");
-    private Image grass2Texture = new Image("/img/grass2.png");
-    private Image grassNightTexture = new Image("/img/grassNight.png");
-    private Image grass2NightTexture = new Image("/img/grass2Night.png");
+    private static final String GRASS_MORNING_PATH = "/img/grassMorning.png";
+    private static final String GRASS_2_MORNING_PATH = "/img/grass2Morning.png";
 
+    private static final String GRASS_PATH = "/img/grass.png";
+    private static final String GRASS_2_PATH = "/img/grass2.png";
 
-    private Image currentSkin;
-    private Map<String, Image> gameElemImgMap = new HashMap<>();
-    private Map<String, Image> charImgMap = new HashMap<>();
+    private static final String GRASS_NIGHT_PATH = "/img/grassNight.png";
+    private static final String GRASS_2_NIGHT_PATH = "/img/grass2Night.png";
+
+    private Map<String, String> gameElemPathMap = new HashMap<>();
+    private Map<String, String> charPathMap = new HashMap<>();
+    private Map<String, Image> imageCache = new HashMap<>();
 
     public HelbTowerView(int width, int height, int rows, int columns, int squareSize) {
         this.width = width;
@@ -30,56 +31,37 @@ public class HelbTowerView {
         this.squareSize = squareSize;
     }
 
-    public void convertPathToImage(ArrayList<GameElement> gameElementList,
-                                   ArrayList<Character> charList,
-                                   Map<String, String> pathToCharSkin) {
-
-        for (GameElement gameElem : gameElementList) {
-            if (gameElem instanceof Teleporter) {
-                if (((Teleporter) gameElem).getColor().equals("Red")) {
-                    gameElemImgMap.put(gameElem.getClass().getName() + "Red", new Image(gameElem.getPathToImage()));
-                } else {
-                    gameElemImgMap.put(gameElem.getClass().getName() + "Blue", new Image(gameElem.getPathToImage()));
-                }
-            } else if (gameElem instanceof Potion) {
-                if (((Potion) gameElem).getColor().equals("Red")) {
-                    gameElemImgMap.put(gameElem.getClass().getName() + "Red", new Image(gameElem.getPathToImage()));
-                } else if (((Potion) gameElem).getColor().equals("Orange")) {
-                    gameElemImgMap.put(gameElem.getClass().getName() + "Orange", new Image(gameElem.getPathToImage()));
-                } else {
-                    gameElemImgMap.put(gameElem.getClass().getName() + "Yellow", new Image(gameElem.getPathToImage()));
-                }
-            }
-            gameElemImgMap.put(gameElem.getClass().getName(), new Image(gameElem.getPathToImage()));
-        }
-
-        for (Character character : charList) {
-            charImgMap.put(character.getClass().getName() + "Down",
-                           new Image(pathToCharSkin.get(character.getClass().getName() + "Down")));
-            charImgMap.put(character.getClass().getName() + "Up",
-                           new Image(pathToCharSkin.get(character.getClass().getName() + "Up")));
-            charImgMap.put(character.getClass().getName() + "Right",
-                           new Image(pathToCharSkin.get(character.getClass().getName() + "Right")));
-            charImgMap.put(character.getClass().getName() + "Left",
-                           new Image(pathToCharSkin.get(character.getClass().getName() + "Left")));
-        }
-
+    public void loadPaths(ArrayList<GameElement> gameElementList, ArrayList<Character> charList,
+                           Map<String, String> pathToCharSkin) {
+        loadGameElementPaths(gameElementList);
+        loadCharacterPaths(charList, pathToCharSkin);
     }
 
-    public void drawPortal(ArrayList<Teleporter> portalList, GraphicsContext gc) {
-        for (Teleporter teleporter : portalList) {
-            gc.drawImage(gameElemImgMap.get(teleporter.getClass().getName()),
-                        teleporter.getPosX() * squareSize,
-                        teleporter.getPosY() * squareSize,
-                        squareSize,
-                        squareSize);
-            gc.drawImage(gameElemImgMap.get(teleporter.getClass().getName()),
-                        teleporter.getPortal2X() * squareSize,
-                        teleporter.getPortal2Y() * squareSize,
-                        squareSize,
-                        squareSize);
+    private void loadGameElementPaths(ArrayList<GameElement> gameElementList) {
+        for (GameElement gameElem : gameElementList) {
+            String key = gameElem.getClass().getName();
+
+            if (gameElem instanceof Teleporter) { // Path to teleporter IMG
+                key += ((Teleporter) gameElem).getColor();
+
+            } else if (gameElem instanceof Potion) { // Path to Potion IMG
+                key += ((Potion) gameElem).getColor();
+
+            }
+            gameElemPathMap.put(key, gameElem.getPathToImage());
         }
-    } 
+    }
+
+    private void loadCharacterPaths(ArrayList<Character> charList, Map<String, String> pathToCharSkin) {
+        for (Character character : charList) {
+            String baseKey = character.getClass().getName();
+            charPathMap.put(baseKey + "Down", pathToCharSkin.get(baseKey + "Down"));
+            charPathMap.put(baseKey + "Up", pathToCharSkin.get(baseKey + "Up"));
+            charPathMap.put(baseKey + "Right", pathToCharSkin.get(baseKey + "Right"));
+            charPathMap.put(baseKey + "Left", pathToCharSkin.get(baseKey + "Left"));
+        }
+    }
+
 
     public void drawGameOver(GraphicsContext gc) {
         gc.setFill(Color.RED);
@@ -89,50 +71,49 @@ public class HelbTowerView {
     }
 
     public void drawBackground(int period, GraphicsContext gc) {
-        Image currentImage;
+        String currentPath;
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                if ((i + j) % 2 == 0) {
-                    if (period == 0) {
-                        currentImage = grassMorningTexture;
-                    } else if (period == 1) {
-                        currentImage = grassTexture;
-                    } else {
-                        currentImage = grassNightTexture;
-                    }
-                } else {
-                    if (period == 0) {
-                        currentImage = grass2MorningTexture;
-                    } else if (period == 1) {
-                        currentImage = grass2Texture;
-                    } else {
-                        currentImage = grass2NightTexture;
-                    }
-                }
-                gc.drawImage(currentImage, i * squareSize, j * squareSize, squareSize, squareSize);
+                currentPath = getBackgroundPath(period, (i + j) % 2 == 0);
+                drawImage(gc, currentPath, i, j);
             }
         }
     }
 
+    private String getBackgroundPath(int period, boolean isEven) {
+        if (isEven) {
+            // Paire = Texture1
+            return period == 0 ? GRASS_MORNING_PATH : (period == 1 ? GRASS_PATH : GRASS_NIGHT_PATH);
+        } else {
+            // Impaire = Texture2
+            return period == 0 ? GRASS_2_MORNING_PATH : (period == 1 ? GRASS_2_PATH : GRASS_2_NIGHT_PATH);
+        }
+    }
+
     public void drawChar(ArrayList<Character> charList, GraphicsContext gc) {
+        String currentSkin;
 
         for (Character character : charList) {
-            if (character.getCurrentDirection() == Character.DOWN) {
-                currentSkin = charImgMap.get(character.getClass().getName()+"Down");
-            } else if (character.getCurrentDirection() == Character.UP) {
-                currentSkin = charImgMap.get(character.getClass().getName()+"Up");
-            } else if (character.getCurrentDirection() == Character.RIGHT) {
-                currentSkin = charImgMap.get(character.getClass().getName()+"Right");
-            } else {
-                currentSkin = charImgMap.get(character.getClass().getName()+"Left");
-            }
+            currentSkin = getCurrentSkinPath(character);
 
-            gc.drawImage(currentSkin,
-                         character.getX() * squareSize,
-                         character.getY() * squareSize,
-                         squareSize,
-                         squareSize);
+            drawImage(gc, currentSkin, character.getX(), character.getY());
+        }
+    }
+
+    private String getCurrentSkinPath(Character character) {
+        String baseKey = character.getClass().getName();
+        switch (character.getCurrentDirection()) {
+            case Character.DOWN:
+                return charPathMap.get(baseKey + "Down");
+            case Character.UP:
+                return charPathMap.get(baseKey + "Up");
+            case Character.RIGHT:
+                return charPathMap.get(baseKey + "Right");
+            case Character.LEFT:
+                return charPathMap.get(baseKey + "Left");
+            default:
+                throw new IllegalArgumentException("Invalid direction");
         }
     }
 
@@ -149,32 +130,37 @@ public class HelbTowerView {
             if (gameElem instanceof Teleporter) {
                 Teleporter teleporter = (Teleporter) gameElem;
                 String color = teleporter.getColor();
-                gc.drawImage(gameElemImgMap.get(teleporter.getClass().getName() + color),
-                        teleporter.getPosX() * squareSize,
-                        teleporter.getPosY() * squareSize,
-                        squareSize,
-                        squareSize);
-                gc.drawImage(gameElemImgMap.get(teleporter.getClass().getName() + color),
-                        teleporter.getPortal2X() * squareSize,
-                        teleporter.getPortal2Y() * squareSize,
-                        squareSize,
-                        squareSize);
+                drawImage(gc, gameElemPathMap.get(teleporter.getClass().getName() + color),
+                        teleporter.getPosX(),
+                        teleporter.getPosY());
+                drawImage(gc, gameElemPathMap.get(teleporter.getClass().getName() + color),
+                        teleporter.getPortal2X(),
+                        teleporter.getPortal2Y());
                 
             } else if (gameElem instanceof Potion) {
                 Potion potion = (Potion) gameElem;
                 String color = potion.getColor();
-                gc.drawImage(gameElemImgMap.get(potion.getClass().getName() + color),
-                        potion.getPosX() * squareSize,
-                        potion.getPosY() * squareSize,
-                        squareSize,
-                        squareSize);
+                drawImage(gc, gameElemPathMap.get(potion.getClass().getName() + color),
+                        potion.getPosX(),
+                        potion.getPosY());
             } else {
-                gc.drawImage(gameElemImgMap.get(gameElem.getClass().getName()),
-                        gameElem.getPosX() * squareSize,
-                        gameElem.getPosY() * squareSize,
-                        squareSize,
-                        squareSize);
+                drawImage(gc, gameElemPathMap.get(gameElem.getClass().getName()),
+                        gameElem.getPosX(),
+                        gameElem.getPosY());
             }
         }
     }
+
+    private void drawImage(GraphicsContext gc, String pathToImg, int x, int y) {
+        if (!imageCache.containsKey(pathToImg)) {
+            // Chargez l'image uniquement si elle n'est pas déjà en cache
+            Image image = new Image(pathToImg);
+            imageCache.put(pathToImg, image);
+        }
+    
+        Image image = imageCache.get(pathToImg);
+        gc.drawImage(image, x * squareSize, y * squareSize, squareSize, squareSize);
+        
+    }
+    
 }

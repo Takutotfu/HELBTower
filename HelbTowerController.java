@@ -30,7 +30,7 @@ public class HelbTowerController {
     private static final int ROWS = 21;
     private static final int COLUMNS = 15;
     private static final int SQUARE_SIZE = WIDTH / ROWS;
-    private static final int CROSS_OPENING = 5;
+    private static final int CROSS_OPENING = 5; // = La croix au centre du board
     private static final int TOWER_X = ROWS / 4;
     private static final int TOWER_Y = COLUMNS / 4;
 
@@ -88,7 +88,7 @@ public class HelbTowerController {
             public void handle(KeyEvent event) {
                 KeyCode code = event.getCode();
 
-                if (model.isANewCycle(lastTimeKeyPressed, model.getMainCharDelay()) || model.isPotionEffect()) {
+                if (model.isTimePassed(lastTimeKeyPressed, model.getMainCharDelay()) || model.isPotionEffect()) {
                     lastTimeKeyPressed = System.currentTimeMillis();
 
                     if (code == KeyCode.RIGHT || code == KeyCode.D) {
@@ -168,15 +168,12 @@ public class HelbTowerController {
                 } else if (code == KeyCode.S) {
                     if (isAdditionalActivated) {
                         isAdditionalActivated = false;
-                        model.setScore(0);
-                        initGame();
-                        System.out.println("Additional desactivated");
                     } else {
                         isAdditionalActivated = true;
-                        model.setScore(0);
-                        initGame();
-                        System.out.println("Additional activated");
                     }
+                    model.setScore(0);
+                    initGame();
+                    System.out.println("Additional " + (isAdditionalActivated ? "activated" : "deactivated"));
                 }
             }
         });
@@ -228,21 +225,19 @@ public class HelbTowerController {
             redGuard.setAlive();
         }
 
-        if (model.isANewCycle(lastTimeGuardMove, model.getGuardDelay())) {
+        if (model.isTimePassed(lastTimeGuardMove, model.getGuardDelay())) {
             lastTimeGuardMove = System.currentTimeMillis();
             orangeGuard.move(model.getGameElementList());
             blueGuard.move(model.getGameElementList());
             redGuard.move(model.getGameElementList());
         }
 
-        if (model.isANewCycle(lastTimePurpleGuardMove, model.getPurpleDelay())) {
+        if (model.isTimePassed(lastTimePurpleGuardMove, model.getPurpleDelay())) {
             lastTimePurpleGuardMove = System.currentTimeMillis();
             purpleGuard.move(model.getGameElementList());
         }
 
-        model.triggerPortal(mainChar);
-
-        //mainChar.isKillByGuards(charactersArray);
+        mainChar.isKillByGuards(charactersArray);
 
         if (!(mainChar.isAlive())) {
             model.setGameOver();
@@ -278,25 +273,11 @@ public class HelbTowerController {
         model.generateWall(CROSS_OPENING);
         model.generateTower(TOWER_X, TOWER_Y);
 
-        // Reset du garde orange
-        orangeGuard.unsetAlive();
-        orangeGuard.setLocation(TOWER_X, TOWER_Y);
-        orangeGuard.setDown();
-
-        // Reset du garde bleue
-        blueGuard.unsetAlive();
-        blueGuard.setLocation(ROWS - TOWER_X, TOWER_Y);
-        blueGuard.setDown();
-
-        // Reset du garde rouge
-        redGuard.unsetAlive();
-        redGuard.setLocation(TOWER_X, COLUMNS - TOWER_Y);
-        redGuard.setDown();
-
-        // Reset du garde mauve
-        purpleGuard.unsetAlive();
-        purpleGuard.setLocation(ROWS - TOWER_X, COLUMNS - TOWER_Y);
-        purpleGuard.setDown();
+        // reset des guards
+        resetGuard(orangeGuard, TOWER_X, TOWER_Y);
+        resetGuard(blueGuard, ROWS - TOWER_X, TOWER_Y);
+        resetGuard(redGuard, TOWER_X, COLUMNS - TOWER_Y);
+        resetGuard(purpleGuard, ROWS - TOWER_X, COLUMNS - TOWER_Y);
         
         // regeneration des potion
         for (int i = 0; i < NBR_OF_POTIONS; i++) {
@@ -322,7 +303,7 @@ public class HelbTowerController {
         model.generateCoin();
 
         // conversion des path en image dans la view
-        view.convertPathToImage(model.getGameElementList(),
+        view.loadPaths(model.getGameElementList(),
                                 charactersArray,
                                 charactersPathMap);
 
@@ -330,6 +311,12 @@ public class HelbTowerController {
         timeline = new Timeline(new KeyFrame(Duration.millis(20), e -> run(gc)));
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
+    }
+    
+    private void resetGuard(Guard guard, int x, int y) {
+        guard.unsetAlive();
+        guard.setLocation(x, y);
+        guard.setDown();
     }
 
     public boolean is25percentCoinsTaked() {

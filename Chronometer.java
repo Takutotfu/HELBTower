@@ -1,5 +1,6 @@
 public class Chronometer extends GameElement{
 
+    private final int POWER = 5; // How much case teleportation
     private final int DURATION = 10000; // Duration of effect
     private final int DELAY = 500; // On guard effect
 
@@ -19,6 +20,8 @@ public class Chronometer extends GameElement{
     public boolean isTaked() {return isTaken;}
 
     public void unsetTaked() {isTaken = false;}
+
+    public int getPower() {return POWER;}
 
     public int getDuration() {return DURATION;}
 
