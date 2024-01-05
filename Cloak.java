@@ -1,19 +1,26 @@
 public class Cloak extends GameElement {
-    private boolean isTaked;
+    
+    // Indique si la cape a été prise par un personnage
+    private boolean isTaked = false;
 
+    // Constructeur
     public Cloak(int posX, int posY) {
         super(posX, posY, new String[]{"/img/cloak.png"});
-        isTaked = false;
     }
 
+    // Déclenche l'action associée à la cape
     @Override
-    public void triggerAction(HelbTowerModel gameBoard) {
+    public void triggerAction(Model gameBoard) {
+        // Marque la cape comme prise
         isTaked = true;
+        // Déplace la cape vers une position vide sur le plateau
         setPosX(gameBoard.getVoidX());
         setPosY(gameBoard.getVoidY());
     }
 
+    // Vérifie si la cape a été prise
     public boolean isTaked() {return isTaked;}
 
+    // Réinitialise l'état de la cape (non prise)
     public void unsetTaked() {isTaked = false;}
 }

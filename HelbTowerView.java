@@ -7,6 +7,7 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
+// Classe responsable de l'affichage dans le jeu
 public class HelbTowerView {
     private int width, height, rows, columns, squareSize;
 
@@ -19,10 +20,11 @@ public class HelbTowerView {
     private static final String GRASS_NIGHT_PATH = "/img/grassNight.png";
     private static final String GRASS_2_NIGHT_PATH = "/img/grass2Night.png";
 
-    private Map<String, String> gameElemPathMap = new HashMap<>();
-    private Map<String, String> charPathMap = new HashMap<>();
-    private Map<String, Image> imageCache = new HashMap<>();
+    private Map<String, String> gameElemPathMap = new HashMap<>();  // Map des chemins des éléments de jeu
+    private Map<String, String> charPathMap = new HashMap<>();  // Map des chemins des personnages
+    private Map<String, Image> imageCache = new HashMap<>();  // Cache des images pour optimiser la mémoire (éviter les crash)
 
+    // Constructeur
     public HelbTowerView(int width, int height, int rows, int columns, int squareSize) {
         this.width = width;
         this.height = height;
@@ -31,20 +33,22 @@ public class HelbTowerView {
         this.squareSize = squareSize;
     }
 
+    // Charge les chemins des éléments du jeu et des personnages
     public void loadPaths(ArrayList<GameElement> gameElementList, ArrayList<Character> charList,
                            Map<String, String> pathToCharSkin) {
         loadGameElementPaths(gameElementList);
         loadCharacterPaths(charList, pathToCharSkin);
     }
 
+    // Charge les chemins des éléments de jeu
     private void loadGameElementPaths(ArrayList<GameElement> gameElementList) {
         for (GameElement gameElem : gameElementList) {
             String key = gameElem.getClass().getName();
 
-            if (gameElem instanceof Teleporter) { // Path to teleporter IMG
+            if (gameElem instanceof Teleporter) {  // Chemin vers l'image du téléporteur
                 key += ((Teleporter) gameElem).getColor();
 
-            } else if (gameElem instanceof Potion) { // Path to Potion IMG
+            } else if (gameElem instanceof Potion) {  // Chemin vers l'image de la potion
                 key += ((Potion) gameElem).getColor();
 
             }
@@ -52,6 +56,7 @@ public class HelbTowerView {
         }
     }
 
+    // Charge les chemins des personnages
     private void loadCharacterPaths(ArrayList<Character> charList, Map<String, String> pathToCharSkin) {
         for (Character character : charList) {
             String baseKey = character.getClass().getName();
@@ -62,14 +67,14 @@ public class HelbTowerView {
         }
     }
 
-
-    public void drawGameOver(GraphicsContext gc) {
+    // Affiche l'écran de fin de jeu
+    public void showGameOver(GraphicsContext gc) {
         gc.setFill(Color.RED);
         gc.setFont(new Font("Digital-7", 70));
         gc.fillText("Game Over!", width / 3, height / 2);
-        return;
     }
 
+    // Dessine l'arrière-plan du jeu
     public void drawBackground(int period, GraphicsContext gc) {
         String currentPath;
 
@@ -81,6 +86,7 @@ public class HelbTowerView {
         }
     }
 
+    // Récupère le chemin de l'arrière-plan en fonction de la période du jeu
     private String getBackgroundPath(int period, boolean isEven) {
         if (isEven) {
             // Paire = Texture1
@@ -91,6 +97,7 @@ public class HelbTowerView {
         }
     }
 
+    // Dessine les personnages du jeu
     public void drawChar(ArrayList<Character> charList, GraphicsContext gc) {
         String currentSkin;
 
@@ -101,6 +108,7 @@ public class HelbTowerView {
         }
     }
 
+    // Récupère le chemin de l'image du personnage en fonction de sa direction actuelle
     private String getCurrentSkinPath(Character character) {
         String baseKey = character.getClass().getName();
         switch (character.getCurrentDirection()) {
@@ -113,18 +121,20 @@ public class HelbTowerView {
             case Character.LEFT:
                 return charPathMap.get(baseKey + "Left");
             default:
-                throw new IllegalArgumentException("Invalid direction");
+                throw new IllegalArgumentException("Direction invalide");
         }
     }
 
-    public void drawScore(int score, int coinCounter, int bestScore, GraphicsContext gc) {
+    // Affiche le score du jeu
+    public void showScore(int score, int coinCounter, int bestScore, GraphicsContext gc) {
         gc.setFill(Color.YELLOW);
-        gc.setFont(new Font("IMPACT", 20));
+        gc.setFont(new Font("Fonty Python", 20));
         gc.fillText("Score: " + score, 10, 20);
         gc.fillText("Best score: " + bestScore, 200, 20);
         gc.fillText("Coin: " + coinCounter, width - 100, 20);
     }
 
+    // Dessine les éléments du jeu (téléporteurs, potions, etc.)
     public void drawGameElements(ArrayList<GameElement> gameElementList, GraphicsContext gc) {
         for (GameElement gameElem : gameElementList) {
             if (gameElem instanceof Teleporter) {
@@ -151,6 +161,7 @@ public class HelbTowerView {
         }
     }
 
+    // Dessine une image sur le canevas
     private void drawImage(GraphicsContext gc, String pathToImg, int x, int y) {
         if (!imageCache.containsKey(pathToImg)) {
             // Chargez l'image uniquement si elle n'est pas déjà en cache
@@ -160,7 +171,5 @@ public class HelbTowerView {
     
         Image image = imageCache.get(pathToImg);
         gc.drawImage(image, x * squareSize, y * squareSize, squareSize, squareSize);
-        
     }
-    
 }

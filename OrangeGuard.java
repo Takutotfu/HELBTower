@@ -1,18 +1,25 @@
 import java.util.ArrayList;
 
+// Classe représentant un garde orange dans le jeu
 public class OrangeGuard extends Guard {
 
+    // Constructeur
     public OrangeGuard(int x, int y) {
         super(x, y, new String[] { "/img/orangeGuardLeft.png",
-                                       "/img/orangeGuardRight.png",
-                                       "/img/orangeGuardUp.png",
-                                       "/img/orangeGuardDown.png" });
+                                   "/img/orangeGuardRight.png",
+                                   "/img/orangeGuardUp.png",
+                                   "/img/orangeGuardDown.png" });
     }
 
+    // Redéfinition de la méthode move de la superclasse
     @Override
     public void move(ArrayList<GameElement> gameElementList) {
+        // Vérifie si le garde est en vie
         if (isAlive()) {
+            // Génère un nombre aléatoire entre 0 et 3 inclus
             int random = (int) (Math.random() * 4);
+
+            // Effectue le déplacement en fonction du nombre aléatoire généré
             switch (random) {
                 case 0:
                     setRight();
@@ -44,5 +51,4 @@ public class OrangeGuard extends Guard {
             }
         }
     }
-
 }

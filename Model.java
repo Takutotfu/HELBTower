@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class HelbTowerModel {
+public class Model {
     private int period = 0;
 
     private int rows = 0;
@@ -27,7 +27,7 @@ public class HelbTowerModel {
     private boolean isWearingCloak = false;
 
     private int chronometerCooldown = 0;
-    private int guardDelaySave = guardDelay;
+    private int guardDelaySave = 0;
     private long lastTimeChronometerTaked = 0;
     private boolean isChronometerEffect = false;
 
@@ -41,7 +41,7 @@ public class HelbTowerModel {
 
     private ArrayList<GameElement> gameElementList = new ArrayList<GameElement>();
 
-    public HelbTowerModel(int rows, int columns, int period, MainCharacter mainChar) {
+    public Model(int rows, int columns, int period, MainCharacter mainChar) {
         // Constructeur
 
         this.rows = rows;
@@ -268,11 +268,11 @@ public class HelbTowerModel {
             }
         }
 
-        if (isTimePassed(lastTimePotionTaked, potionCooldown)) { // verif si l'effet de la potion est terminé
+        if (isTimePassed(lastTimePotionTaked, potionCooldown) && isPotionEffect) { // verif si l'effet de la potion est terminé
             isPotionEffect = false;
         }
         
-        if (isTimePassed(lastTimeChronometerTaked, chronometerCooldown)) { // verif si l'effet du chronometre est terminé
+        if (isTimePassed(lastTimeChronometerTaked, chronometerCooldown) && isChronometerEffect) { // verif si l'effet du chronometre est terminé
             setGuardDelay(guardDelaySave);
             isChronometerEffect = false;
         }
@@ -308,8 +308,7 @@ public class HelbTowerModel {
         // Traitement de l'interaction avec un chronometre
 
         Chronometer chronometer = (Chronometer) gameElem;
-        int power = chronometer.getPower();
-        Point postion = mainChar.getMemoryPostion().get(mainChar.getMemoryPostion().size() - power);
+        Point postion = mainChar.getMemoryPostion();
 
         mainChar.setLocation(postion.getX(), postion.getY());
 
@@ -317,14 +316,15 @@ public class HelbTowerModel {
             chronometerCooldown = chronometer.getDuration();
             lastTimeChronometerTaked = System.currentTimeMillis();
             isChronometerEffect = true;
-            setGuardDelay(guardDelay + chronometer.getDuration());
+            guardDelaySave = guardDelay;
+            setGuardDelay(guardDelay + chronometer.getDelay());
         }
         chronometer.unsetTaked();
     }
 
     public void triggerPortal() {
         // Traitement de la téléportation du joueur
-        // A part du eatGameElement() car nous devons savoir s'il c'est le premier ou second portail
+        // A part du eatGameElement() car nous devons savoir si c'est le premier ou second portail
 
         if (mainChar.getX() == portalBlue.getPosX() && mainChar.getY() == portalBlue.getPosY()) {
             mainChar.setLocation(portalBlue.getPortal2X(), portalBlue.getPortal2Y() - 1);

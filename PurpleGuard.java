@@ -1,40 +1,42 @@
 import java.awt.Point;
 import java.util.ArrayList;
 
+// Classe représentant un garde violet dans le jeu
 public class PurpleGuard extends Guard {
-    private boolean currentDirectionHasReached = true;
-    private ArrayList<Point> towersPosition = new ArrayList<>();
-    private Point currentDirection;
+    private boolean currentDirectionHasReached = true; // Indique si la direction actuelle a été atteinte
+    private ArrayList<Point> towersPosition = new ArrayList<>(); // Positions des tours
+    private Point currentDirection; // Direction actuelle vers laquelle se déplacer
 
+    // Constructeur
     public PurpleGuard(int x, int y, int towerX, int towerY, int rows, int columns) {
         super(x, y, new String[]{ "/img/purpleGuardLeft.png",
                                       "/img/purpleGuardRight.png",
                                       "/img/purpleGuardUp.png",
                                       "/img/purpleGuardDown.png" });
         
-        towersPosition.add(new Point(towerX-2, towerY-2)); // top left tower
-        towersPosition.add(new Point(rows-towerX+1, towerY-2)); // top right tower 
-        towersPosition.add(new Point(x-2, columns-towerY)); // bottom left tower
-        towersPosition.add(new Point(x+1, columns-towerY)); // bottom right tower
+        // Initialisation des positions des tours
+        towersPosition.add(new Point(towerX-2, towerY-2)); // Tour en haut à gauche
+        towersPosition.add(new Point(rows-towerX+1, towerY-2)); // Tour en haut à droite
+        towersPosition.add(new Point(x-2, columns-towerY)); // Tour en bas à gauche
+        towersPosition.add(new Point(x+1, columns-towerY)); // Tour en bas à droite
     }
 
+    // Méthode pour gérer le déplacement du garde
     @Override
     public void move(ArrayList<GameElement> gameElementList) {
         if (isAlive()) {
             if (currentDirectionHasReached) {
-                setRandomDirection();
+                setRandomDirection(); // Définir une nouvelle direction aléatoire
             } else {
-                moveTowards(gameElementList);
+                moveTowards(gameElementList); // Se déplacer vers la direction définie
             }
         }
     }
 
+    // Méthode pour déplacer le garde vers la direction définie
     public void moveTowards(ArrayList<GameElement> gameElementList) {
-        // On verifie si la currentDirection est atteinte
-        if (currentDirection.getX() == getX() && currentDirection.getY() == getY()) {
-            currentDirectionHasReached = true;
-        }
-
+        
+        // Déplacer le garde en fonction de la currentDirection
         if (currentDirection.getX() < getX() && isMoveOk(gameElementList, getX()-1, getY())) {
             moveLeft();
         } else if (currentDirection.getX() > getX() && isMoveOk(gameElementList, getX()+1, getY())) {
@@ -44,11 +46,17 @@ public class PurpleGuard extends Guard {
         } else if (currentDirection.getY() < getY() && isMoveOk(gameElementList, getX(), getY()-1)) {
             moveUp();
         } else {
-            // si la currentDirection est inatteignable on la change
+            // Si la currentDirection est inatteignable, on la change
+            currentDirectionHasReached = true;
+        }
+        
+        // Vérifier si la currentDirection est atteinte
+        if (currentDirection.getX() == getX() && currentDirection.getY() == getY()) {
             currentDirectionHasReached = true;
         }
     }
 
+    // Méthode pour définir une nouvelle direction aléatoire
     private void setRandomDirection() {
         int random = (int) (Math.random() * 4);
         switch (random) {
