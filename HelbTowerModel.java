@@ -1,3 +1,4 @@
+import java.awt.Point;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -25,6 +26,11 @@ public class HelbTowerModel {
 
     private boolean isWearingCloak = false;
 
+    private int chronometerCooldown = 0;
+    private long lastTimeChronometerTaked = 0;
+    private boolean isChronometerEffect = false;
+    private int guardDelaySave = guardDelay;
+
     private long lastTimePotionTaked;
     private boolean isPotionEffect = false;
     private int potionCooldown = 0;
@@ -33,7 +39,6 @@ public class HelbTowerModel {
     private int bestScore;
     private int coinCounter = 0;
 
-    private ArrayList<Coin> coinList = new ArrayList<Coin>();
     private ArrayList<GameElement> gameElementList = new ArrayList<GameElement>();
 
     public HelbTowerModel(int rows, int columns, int period, MainCharacter mainChar) {
@@ -64,6 +69,24 @@ public class HelbTowerModel {
         }
     }
 
+    public void generateChronometer() {
+        start:
+        while (true) {
+            int randomXPos = (int) (Math.random() * rows-1);
+            int randomYPos = (int) (Math.random() * columns-1);
+
+            for (GameElement gameElement : gameElementList) {
+                if (gameElement.getPosX() == randomXPos 
+                        && gameElement.getPosY() == randomYPos) {
+                    continue start;
+                }
+            }
+
+            gameElementList.add(new Chronometer(randomXPos, randomYPos));
+            break;
+        }
+    }
+
     public void generatePotion() {
         start:
         while (true) {
@@ -78,8 +101,7 @@ public class HelbTowerModel {
                 }
             }
 
-            Potion newPotion = new Potion(randomXPos, randomYPos, randomPotion);
-            gameElementList.add(newPotion);
+            gameElementList.add(new Potion(randomXPos, randomYPos, randomPotion));
             break;
         }
     }
@@ -90,7 +112,6 @@ public class HelbTowerModel {
             for (int j = 0; j < columns - 1; j++) {
                 if (!(isGameElemInCase(i, j))) {
                     Coin newCoin = new Coin(i, j);
-                    coinList.add(newCoin);
                     gameElementList.add(newCoin);
                     coinCounter++;
                 }
@@ -164,7 +185,7 @@ public class HelbTowerModel {
         }
     }
 
-    public Guard generateRandomGuard(int maxCaseForBlueGuard) {
+    public Guard generateRandomGuard() {
         Guard newGuard;
         int randomGuard = (int) (Math.random() * 4);
 
@@ -187,7 +208,7 @@ public class HelbTowerModel {
                     newGuard = new OrangeGuard(randomPosX, randomPosY);
                     break;
                 case 2:
-                    newGuard = new BlueGuard(randomPosX, randomPosY, maxCaseForBlueGuard, rows, columns);
+                    newGuard = new BlueGuard(randomPosX, randomPosY, rows, columns);
                     break;
                 default:
                     newGuard = new PurpleGuard(randomPosX, randomPosY, randomPosY, randomPosY, randomPosY, randomPosY);
@@ -201,12 +222,12 @@ public class HelbTowerModel {
 
     }
 
-    public void eatGameElement() {
+    public void eatGameElement(boolean isPurpleGuardAlive) {
         for (GameElement gameElem : gameElementList) {
             if (gameElem.getPosX() == mainChar.getX() && gameElem.getPosY() == mainChar.getY()) {
                 gameElem.triggerAction(this);
 
-                if (gameElem instanceof Coin) { // Eat Coin
+                if (gameElem instanceof Coin && isPurpleGuardAlive) { // Eat Coin
                     purpleDelay--;
 
                 } else if (gameElem instanceof Potion) { // Drink Potion
@@ -227,6 +248,19 @@ public class HelbTowerModel {
                     }
                     cloak.unsetTaked();
 
+                } else if (gameElem instanceof Chronometer) { // Take Chronometer
+                    Chronometer chronometer = (Chronometer) gameElem;
+                    Point postion = mainChar.getMemoryPostion().get(mainChar.getMemoryPostion().size()-6);
+                    mainChar.setLocation(postion.getX(), postion.getY());
+
+                    if (chronometer.isTaked() && !isChronometerEffect) {
+                        chronometerCooldown = chronometer.getDuration();
+                        lastTimeChronometerTaked = System.currentTimeMillis();
+                        isChronometerEffect = true;
+                        setGuardDelay(guardDelay+chronometer.getDuration());
+                    }
+                    chronometer.unsetTaked();
+
                 } else if (gameElem instanceof Wall) { // Passed trough a Wall
                     isWearingCloak = false;
                 }
@@ -234,6 +268,10 @@ public class HelbTowerModel {
         }
         if (isEffectFinish(lastTimePotionTaked, potionCooldown)) { // verifPotionFinish
             isPotionEffect = false;
+        }
+        if (isEffectFinish(lastTimeChronometerTaked, chronometerCooldown)) {
+            setGuardDelay(guardDelaySave);
+            isChronometerEffect = false;
         }
     }
 

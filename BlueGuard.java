@@ -2,7 +2,6 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 public class BlueGuard extends Guard {
-    private int maxCase;
     private int rows;
     private int columns;
 
@@ -11,12 +10,11 @@ public class BlueGuard extends Guard {
     private Point currentDirection;
     private ArrayList<Point> memoryPosition = new ArrayList<>();
 
-    public BlueGuard(int x, int y, int maxCase, int rows, int columns) {
+    public BlueGuard(int x, int y, int rows, int columns) {
         super(x, y, new String[]{ "/img/blueGuardLeft.png",
                                       "/img/blueGuardRight.png",
                                       "/img/blueGuardUp.png",
                                       "/img/blueGuardDown.png" });
-        this.maxCase = maxCase;
         this.rows = rows;
         this.columns = columns;
     }
@@ -24,6 +22,14 @@ public class BlueGuard extends Guard {
     @Override
     public void move(ArrayList<GameElement> gameElementList) {
         if (isAlive()) {
+            int maxCase = 0;
+
+            for (GameElement gameElem : gameElementList) {
+                if (!(gameElem instanceof Wall)) {
+                    maxCase++;
+                }
+            }
+
             if (memoryPosition.size() == maxCase) {
                 memoryPosition.clear();
             }

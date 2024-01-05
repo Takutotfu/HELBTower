@@ -33,8 +33,10 @@ public class HelbTowerController {
     private static final int CROSS_OPENING = 5;
     private static final int TOWER_X = ROWS / 4;
     private static final int TOWER_Y = COLUMNS / 4;
+
     private static final int NBR_OF_POTIONS = 6;
     private static final int NBR_OF_CLOAK = 5;
+    private static final int NBR_OF_CHRONOMETER = 3;
 
     private static final int MORNING = 0;
     private static final int DAY = 1;
@@ -45,7 +47,6 @@ public class HelbTowerController {
     private static final int NIGHT_DELAY = 200;
 
     private int coinNbr;
-    private int maxCaseForBlueGuard = 0;
 
     private long lastTimeKeyPressed = System.currentTimeMillis();
     private long lastTimeGuardMove = System.currentTimeMillis();
@@ -53,14 +54,17 @@ public class HelbTowerController {
 
     private GraphicsContext gc;
 
+    private boolean isAdditionalActivated = false;
+
     private ArrayList<Character> charactersArray = new ArrayList<>();
     private ArrayList<Character> cheatedGuard = new ArrayList<>();
+
     private HashMap<String, String> charactersPathMap = new HashMap<>();
 
     public HelbTowerController(Stage primaryStage) {
         mainChar = new MainCharacter(ROWS / 2, COLUMNS / 4);
         orangeGuard = new OrangeGuard(TOWER_X, TOWER_Y);
-        blueGuard = new BlueGuard(ROWS - TOWER_X, TOWER_Y, maxCaseForBlueGuard, ROWS, COLUMNS);
+        blueGuard = new BlueGuard(ROWS - TOWER_X, TOWER_Y, ROWS, COLUMNS);
         purpleGuard = new PurpleGuard(ROWS - TOWER_X, COLUMNS - TOWER_Y, TOWER_X, TOWER_Y, ROWS, COLUMNS);
         redGuard = new RedGuard(TOWER_X, COLUMNS - TOWER_Y, mainChar);
         model = new HelbTowerModel(ROWS, COLUMNS, DAY, mainChar);
@@ -92,59 +96,67 @@ public class HelbTowerController {
                         if (mainChar.isNextCaseIsAvaible(model.getGameElementList())
                                 || model.isWearingCloak() && mainChar.getX() + 1 < ROWS - 1) {
                             mainChar.moveRight();
+                            // add in memory for additional
+                            mainChar.addThisPositionInMemory();
                         }
                     } else if (code == KeyCode.LEFT || code == KeyCode.Q) {
                         mainChar.setLeft();
                         if (mainChar.isNextCaseIsAvaible(model.getGameElementList())
                                 || model.isWearingCloak() && mainChar.getX() - 1 > 0) {
                             mainChar.moveLeft();
+                            // add in memory for additional
+                            mainChar.addThisPositionInMemory();
                         }
                     } else if (code == KeyCode.UP || code == KeyCode.Z) {
                         mainChar.setUp();
                         if (mainChar.isNextCaseIsAvaible(model.getGameElementList())
                                 || model.isWearingCloak() && mainChar.getY() - 1 > 0) {
                             mainChar.moveUp();
+                            // add in memory for additional
+                            mainChar.addThisPositionInMemory();
                         }
                     } else if (code == KeyCode.DOWN || code == KeyCode.S) {
                         mainChar.setDown();
                         if (mainChar.isNextCaseIsAvaible(model.getGameElementList())
                                 || model.isWearingCloak() && mainChar.getY() + 1 < COLUMNS - 1) {
                             mainChar.moveDown();
+                            // add in memory for additional
+                            mainChar.addThisPositionInMemory();
                         }
                     }
                     System.out.println("x:" + mainChar.getX() + " ; y:" + mainChar.getY()); // DEBUG POSITION
                 }
 
                 // CHEAT CODES
-                if (code == KeyCode.DIGIT0) {
+                if (code == KeyCode.DIGIT0 || code == KeyCode.NUMPAD0) {
                     initGame();
                     model.setScore(0);
                     System.out.println("Game reset");
-                } else if (code == KeyCode.DIGIT1) {
+                } else if (code == KeyCode.DIGIT1 || code == KeyCode.NUMPAD1) {
                     model.setPeriod(MORNING);
                     model.setGuardDelay(MORNING_DELAY);
                     System.out.println("Game set on morning");
-                } else if (code == KeyCode.DIGIT2) {
+                } else if (code == KeyCode.DIGIT2 || code == KeyCode.NUMPAD2) {
                     model.setPeriod(DAY);
                     model.setGuardDelay(DAY_DELAY);
                     System.out.println("Game set on day");
-                } else if (code == KeyCode.DIGIT3) {
+                } else if (code == KeyCode.DIGIT3 || code == KeyCode.NUMPAD3) {
                     model.setPeriod(NIGHT);
                     model.setGuardDelay(NIGHT_DELAY);
                     System.out.println("Game set on night");
-                } else if (code == KeyCode.DIGIT4) {
+                } else if (code == KeyCode.DIGIT4 || code == KeyCode.NUMPAD4) {
                     model.generatePotion();
-                } else if (code == KeyCode.DIGIT5) {
+                } else if (code == KeyCode.DIGIT5 || code == KeyCode.NUMPAD5) {
                     model.generateCloak();
-                } else if (code == KeyCode.DIGIT6) {
-                    Guard newGuard = model.generateRandomGuard(maxCaseForBlueGuard);
+                } else if (code == KeyCode.DIGIT6 || code == KeyCode.NUMPAD6) {
+                    Guard newGuard = model.generateRandomGuard();
                     cheatedGuard.add(newGuard);
                     charactersArray.add(newGuard);
                     System.out.println("Random guard generate: " + newGuard);
                     
-                    Timeline newGuardTimeline = new Timeline(new KeyFrame(Duration.millis(model.getGuardDelay()), e -> newGuard.move(model.getGameElementList())));
-                    newGuardTimeline.setCycleCount(Animation.INDEFINITE);
-                    newGuardTimeline.play();
+                    Timeline cheatedGuardTimeline = new Timeline(new KeyFrame(Duration.millis(model.getGuardDelay()), e -> newGuard.move(model.getGameElementList())));
+                    cheatedGuardTimeline.setCycleCount(Animation.INDEFINITE);
+                    cheatedGuardTimeline.play();
                 } else if (code == KeyCode.R) {
                     redGuard.unsetAlive();
                 } else if (code == KeyCode.B) {
@@ -154,9 +166,18 @@ public class HelbTowerController {
                 } else if (code == KeyCode.O) {
                     orangeGuard.unsetAlive();
                 } else if (code == KeyCode.S) {
-                    System.out.println("Additional activated");
+                    if (isAdditionalActivated) {
+                        isAdditionalActivated = false;
+                        model.setScore(0);
+                        initGame();
+                        System.out.println("Additional desactivated");
+                    } else {
+                        isAdditionalActivated = true;
+                        model.setScore(0);
+                        initGame();
+                        System.out.println("Additional activated");
+                    }
                 }
-
             }
         });
 
@@ -169,16 +190,10 @@ public class HelbTowerController {
         initGame();
 
         coinNbr = model.getCoinCounter();
-
-        for (GameElement gameElem : model.getGameElementList()) {
-            if (!(gameElem instanceof Wall)) {
-                maxCaseForBlueGuard++;
-            }
-        }
     }
 
     private void run(GraphicsContext gc) {
-        // Views
+        
         if (model.getGameOver()) {
             if (model.getScore() > model.getBestScore()) {
                 model.setBestScore(model.getScore());
@@ -189,6 +204,7 @@ public class HelbTowerController {
             return;
         }
 
+        // Views
         view.drawBackground(model.getPeriod(), gc);
         view.drawGameElements(model.getGameElementList(), gc);
 
@@ -203,7 +219,7 @@ public class HelbTowerController {
             model.unsetLevelFinished();
         }
 
-        model.eatGameElement();
+        model.eatGameElement(purpleGuard.isAlive());
 
         if (is25percentCoinsTaked()) {
             orangeGuard.setAlive();
@@ -226,7 +242,7 @@ public class HelbTowerController {
 
         model.triggerPortal(mainChar);
 
-        mainChar.isKillByGuards(charactersArray);
+        //mainChar.isKillByGuards(charactersArray);
 
         if (!(mainChar.isAlive())) {
             model.setGameOver();
@@ -252,6 +268,7 @@ public class HelbTowerController {
         model.getGameElementList().clear();
 
         // Reset du Hero
+        mainChar.getMemoryPostion().clear();
         mainChar.setAlive();
         mainChar.setLocation(ROWS / 2, COLUMNS / 4);
         
@@ -289,6 +306,13 @@ public class HelbTowerController {
         // regeneration des capes
         for (int i = 0; i < NBR_OF_CLOAK; i++) {
             model.generateCloak();
+        }
+
+        // generation des chronometre si activé
+        if (isAdditionalActivated) {
+            for (int i = 0; i < NBR_OF_CHRONOMETER; i++) {
+                model.generateChronometer();
+            }
         }
 
         // Lire le dernier best score enregistré

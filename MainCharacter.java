@@ -1,9 +1,11 @@
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MainCharacter extends Character {
     private boolean isAlive = true;
+    private ArrayList<Point> memoryPosition = new ArrayList<>();
     private Map<String, String> charSkinMap = new HashMap<>();
 
     public MainCharacter(int x, int y) {
@@ -33,7 +35,11 @@ public class MainCharacter extends Character {
         return isAlive;
     }
 
+    public void addThisPositionInMemory() {memoryPosition.add(new Point(getX(),getY()));}
+
     public Map<String, String> getCharSkinMap() {return charSkinMap;}
+
+    public ArrayList<Point> getMemoryPostion() {return memoryPosition;}
 
     public void setAlive() {isAlive=true;}
 }
