@@ -5,6 +5,8 @@ public abstract class Character {
     private final String[] IMAGE_PATHS;
 
     // Constantes représentant les directions
+    // En public et static afin d'être atteignable par toutes les autres classes
+    // Sans avoir besoin d'une instance de la classe.
     public static final int RIGHT = 0;
     public static final int LEFT = 1;
     public static final int DOWN = 2;

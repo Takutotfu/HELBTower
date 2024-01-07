@@ -36,13 +36,15 @@ public class Potion extends GameElement {
     
     // Méthode déclenchée lorsqu'un personnage interagit avec la potion
     @Override
-    public void triggerAction(Model gameBoard) {
+    public void triggerAction(GameBoard gameBoard) {
         // Marque la potion comme ramassée
         setTaked();
 
         // Déplace la pièce vers une position vide sur le plateau
         setPosX(gameBoard.getVoidX());
-        setPosY(gameBoard.getVoidY()); 
+        setPosY(gameBoard.getVoidY());
+
+        gameBoard.triggerPotion(this);;
     }
 
     // Méthode renvoyant la couleur de la potion

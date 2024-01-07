@@ -44,10 +44,10 @@ public class Controller {
     private GraphicsContext gc;
     private Timeline timeline;
 
-    // Variables de classes
+    // Déclaration des Models
 
-    private Model model;
-    private HelbTowerView view;
+    private GameBoard gameBoard;
+    private View view;
     private MainCharacter mainChar;
     private OrangeGuard orangeGuard;
     private BlueGuard blueGuard;
@@ -85,8 +85,8 @@ public class Controller {
         blueGuard = new BlueGuard(ROWS - TOWER_X, TOWER_Y, ROWS, COLUMNS);
         purpleGuard = new PurpleGuard(ROWS - TOWER_X, COLUMNS - TOWER_Y, TOWER_X, TOWER_Y, ROWS, COLUMNS);
         redGuard = new RedGuard(TOWER_X, COLUMNS - TOWER_Y, mainChar);
-        model = new Model(ROWS, COLUMNS, DAY, mainChar);
-        view = new HelbTowerView(WIDTH, HEIGHT, ROWS, COLUMNS, SQUARE_SIZE);
+        gameBoard = new GameBoard(ROWS, COLUMNS, DAY, mainChar);
+        view = new View(WIDTH, HEIGHT, ROWS, COLUMNS, SQUARE_SIZE);
 
         start(primaryStage);
     }
@@ -112,17 +112,17 @@ public class Controller {
                 KeyCode code = event.getCode();
 
                 // Déplacement du Héro
-                if (model.isTimePassed(lastTimeKeyPressed, model.getMainCharDelay()) || model.isPotionEffect()) {
+                if (gameBoard.isTimePassed(lastTimeKeyPressed, gameBoard.getMainCharDelay()) || gameBoard.isPotionEffect()) {
                     lastTimeKeyPressed = System.currentTimeMillis();
 
                     if (code == KeyCode.D || code == KeyCode.RIGHT) {
-                        mainChar.tryMove(Character.RIGHT, model.getGameElementList(), model.isWearingCloak());
+                        mainChar.tryMove(Character.RIGHT, gameBoard.getGameElementList(), gameBoard.isWearingCloak());
                     } else if (code == KeyCode.Q || code == KeyCode.LEFT) {
-                        mainChar.tryMove(Character.LEFT, model.getGameElementList(), model.isWearingCloak());
+                        mainChar.tryMove(Character.LEFT, gameBoard.getGameElementList(), gameBoard.isWearingCloak());
                     } else if (code == KeyCode.Z || code == KeyCode.UP) {
-                        mainChar.tryMove(Character.UP, model.getGameElementList(), model.isWearingCloak());
+                        mainChar.tryMove(Character.UP, gameBoard.getGameElementList(), gameBoard.isWearingCloak());
                     } else if (code == KeyCode.S || code == KeyCode.DOWN) {
-                        mainChar.tryMove(Character.DOWN, model.getGameElementList(), model.isWearingCloak());
+                        mainChar.tryMove(Character.DOWN, gameBoard.getGameElementList(), gameBoard.isWearingCloak());
                     }
 
                     System.out.println("x:" + mainChar.getX() + " ; y:" + mainChar.getY()); // DEBUG POSITION
@@ -132,31 +132,31 @@ public class Controller {
                 if (code == KeyCode.DIGIT0 || code == KeyCode.NUMPAD0) { // Reset de la game
                     isReset = true;
                     initGame();
-                    model.setScore(0);
+                    gameBoard.setScore(0);
                     System.out.println("Game reset");
                 } else if (code == KeyCode.DIGIT1 || code == KeyCode.NUMPAD1) { // Passage du jeu en mode Matin
-                    model.setPeriod(MORNING);
-                    model.setGuardDelay(MORNING_DELAY);
+                    gameBoard.setPeriod(MORNING);
+                    gameBoard.setGuardDelay(MORNING_DELAY);
                     System.out.println("Game set on morning");
                 } else if (code == KeyCode.DIGIT2 || code == KeyCode.NUMPAD2) { // Passage du jeu en mode Jour
-                    model.setPeriod(DAY);
-                    model.setGuardDelay(DAY_DELAY);
+                    gameBoard.setPeriod(DAY);
+                    gameBoard.setGuardDelay(DAY_DELAY);
                     System.out.println("Game set on day");
                 } else if (code == KeyCode.DIGIT3 || code == KeyCode.NUMPAD3) { // Passage du jeu en mode Nuit
-                    model.setPeriod(NIGHT);
-                    model.setGuardDelay(NIGHT_DELAY);
+                    gameBoard.setPeriod(NIGHT);
+                    gameBoard.setGuardDelay(NIGHT_DELAY);
                     System.out.println("Game set on night");
                 } else if (code == KeyCode.DIGIT4 || code == KeyCode.NUMPAD4) { // Génère une potion
-                    model.generatePotion();
+                    gameBoard.generatePotion();
                 } else if (code == KeyCode.DIGIT5 || code == KeyCode.NUMPAD5) { // Génère une cape
-                    model.generateCloak();
+                    gameBoard.generateCloak();
                 } else if (code == KeyCode.DIGIT6 || code == KeyCode.NUMPAD6) { // Génère un garde aléatoire
-                    Guard newGuard = model.generateRandomGuard();
+                    Guard newGuard = gameBoard.generateRandomGuard();
                     cheatedGuard.add(newGuard);
                     charactersArray.add(newGuard);
                     System.out.println("Random guard generate: " + newGuard);
                     
-                    Timeline cheatedGuardTimeline = new Timeline(new KeyFrame(Duration.millis(model.getGuardDelay()), e -> newGuard.move(model.getGameElementList())));
+                    Timeline cheatedGuardTimeline = new Timeline(new KeyFrame(Duration.millis(gameBoard.getGuardDelay()), e -> newGuard.move(gameBoard.getGameElementList())));
                     cheatedGuardTimeline.setCycleCount(Animation.INDEFINITE);
                     cheatedGuardTimeline.play();
                 } else if (code == KeyCode.R) { // Arrête le garde rouge original
@@ -170,7 +170,7 @@ public class Controller {
                 } else if (code == KeyCode.S) { // Active/Désactive les chronomètre
                     isReset = true;
                     isChronometerActivated = !isChronometerActivated;
-                    model.setScore(0);
+                    gameBoard.setScore(0);
                     initGame();
                     System.out.println("Additional " + (isChronometerActivated ? "activated" : "deactivated"));
                 }
@@ -180,17 +180,17 @@ public class Controller {
         // Initialise la partie
         initGame();
 
-        coinNbr = model.getCoinCounter();
+        coinNbr = gameBoard.getCoinCounter();
     }
 
     private void run(GraphicsContext gc) {
         // Méthode executé dans la Timeline du jeu
         
         // Verifie si la partie est finie
-        if (model.getGameOver()) {
-            if (model.getScore() > model.getBestScore()) {
-                model.setBestScore(model.getScore());
-                model.writeBestScore();
+        if (gameBoard.getGameOver()) {
+            if (gameBoard.getScore() > gameBoard.getBestScore()) {
+                gameBoard.setBestScore(gameBoard.getScore());
+                gameBoard.writeBestScore();
             }
             view.showGameOver(gc);
             timeline.stop();
@@ -198,21 +198,21 @@ public class Controller {
         }
 
         // Views (Pour l'affichage)
-        view.drawBackground(model.getPeriod(), gc);
-        view.drawGameElements(model.getGameElementList(), gc);
+        view.drawBackground(gameBoard.getPeriod(), gc);
+        view.drawGameElements(gameBoard.getGameElementList(), gc);
 
         view.drawChar(charactersArray, gc);
-        view.showScore(model.getScore(), model.getCoinCounter(), model.getBestScore(), gc);
+        view.showScore(gameBoard.getScore(), gameBoard.getCoinCounter(), gameBoard.getBestScore(), gc);
 
-        // Models (Pour la logique)
-        if (model.getLevelFinished()) { // Si toute les pièce sont récupérées
+        // GameBoard (Pour la logique)
+        if (gameBoard.getLevelFinished()) { // Si toute les pièce sont récupérées
             timeline.stop();
             initGame();
-            model.setGuardDelay(model.getGuardDelay()-10);
-            model.unsetLevelFinished();
+            gameBoard.setGuardDelay(gameBoard.getGuardDelay()-10);
+            gameBoard.unsetLevelFinished();
         }
 
-        model.eatGameElement(purpleGuard.isAlive());
+        gameBoard.eatGameElement(purpleGuard.isAlive());
 
         // Donne vie aux garde si 25% des pièces sont ramassées
         if (is25percentCoinsTaked()) {
@@ -223,32 +223,32 @@ public class Controller {
         }
 
         // Les gardes bougent lorsque leur delay est dépassé
-        if (model.isTimePassed(lastTimeGuardMove, model.getGuardDelay())) {
+        if (gameBoard.isTimePassed(lastTimeGuardMove, gameBoard.getGuardDelay())) {
             lastTimeGuardMove = System.currentTimeMillis();
-            orangeGuard.move(model.getGameElementList());
-            blueGuard.move(model.getGameElementList());
-            redGuard.move(model.getGameElementList());
+            orangeGuard.move(gameBoard.getGameElementList());
+            blueGuard.move(gameBoard.getGameElementList());
+            redGuard.move(gameBoard.getGameElementList());
         }
 
         // Même chose mais le garde mauve a un delay a part
-        if (model.isTimePassed(lastTimePurpleGuardMove, model.getPurpleDelay())) {
+        if (gameBoard.isTimePassed(lastTimePurpleGuardMove, gameBoard.getPurpleDelay())) {
             lastTimePurpleGuardMove = System.currentTimeMillis();
-            purpleGuard.move(model.getGameElementList());
+            purpleGuard.move(gameBoard.getGameElementList());
         }
 
-        // Verifie si le héro a été tué ou non
-        mainChar.isKillByGuards(charactersArray);
+        // Tue le héro s'il est rencontré par un garde
+        mainChar.killByGuard(charactersArray);
 
         // Si le héro est mort la partie est terminée
         if (!(mainChar.isAlive())) {
-            model.setGameOver();
+            gameBoard.setGameOver();
         }
     }
 
     public void initGame() {
         if (isReset) {
             // On désactive le Game over
-            model.unsetGameOver();
+            gameBoard.unsetGameOver();
 
             // On vide l'array des characters
             charactersArray.clear();
@@ -265,7 +265,7 @@ public class Controller {
             redGuard = new RedGuard(TOWER_X, COLUMNS - TOWER_Y, mainChar);
 
             // On vide la list des gameElements
-            model.getGameElementList().clear();
+            gameBoard.getGameElementList().clear();
 
             isReset = false;
         }
@@ -278,33 +278,33 @@ public class Controller {
         charactersArray.add(redGuard);
 
         // Génération des structures
-        model.generateTeleporter();
-        model.generateBorder();
-        model.generateWall(CROSS_OPENING);
-        model.generateTower(TOWER_X, TOWER_Y);
+        gameBoard.generateTeleporter();
+        gameBoard.generateBorder();
+        gameBoard.generateWall(CROSS_OPENING);
+        gameBoard.generateTower(TOWER_X, TOWER_Y);
 
         // Génération des potion
         for (int i = 0; i < NBR_OF_POTIONS; i++) {
-            model.generatePotion();
+            gameBoard.generatePotion();
         }
         
         // regéneration des capes
         for (int i = 0; i < NBR_OF_CLOAK; i++) {
-            model.generateCloak();
+            gameBoard.generateCloak();
         }
 
-        // génération des chronometre si activé
+        // génération des chronometres si activé
         if (isChronometerActivated) {
             for (int i = 0; i < NBR_OF_CHRONOMETER; i++) {
-                model.generateChronometer();
+                gameBoard.generateChronometer();
             }
         }
 
         // generation des coins
-        model.generateCoin();
+        gameBoard.generateCoin();
 
         // Lire le dernier best score enregistré
-        model.readBestScore();
+        gameBoard.readBestScore();
 
         if (!isReset) {
             // Ajout des paths des character pour la view
@@ -315,7 +315,7 @@ public class Controller {
             charactersPathMap.putAll(redGuard.getCharSkinMap());
 
             // Chargement des paths dans la view
-            view.loadPaths(model.getGameElementList(),
+            view.loadPaths(gameBoard.getGameElementList(),
                            charactersArray,
                            charactersPathMap);
         }
@@ -328,7 +328,7 @@ public class Controller {
     
     public boolean is25percentCoinsTaked() {
         // Renvoie true si 25% des pièces sont récupérées et tout les gardes ne sont pas encore en vie, false sinon
-        return model.getCoinCounter() == (int) (coinNbr * 0.75) && !((orangeGuard.isAlive()) &&
+        return gameBoard.getCoinCounter() == (int) (coinNbr * 0.75) && !((orangeGuard.isAlive()) &&
                 (blueGuard.isAlive()) &&
                 (purpleGuard.isAlive()) &&
                 (redGuard.isAlive()));

@@ -19,11 +19,13 @@ public class Chronometer extends GameElement {
 
     // Déclenche l'action associée au chronomètre
     @Override
-    public void triggerAction(Model gameBoard) {
+    public void triggerAction(GameBoard gameBoard) {
         isTaken = true;
         // Déplace le chronomètre vers une position vide sur le plateau
         setPosX(gameBoard.getVoidX());
         setPosY(gameBoard.getVoidY());
+
+        gameBoard.triggerChronometer(this);
     }
 
     // Vérifie si le chronomètre a été pris

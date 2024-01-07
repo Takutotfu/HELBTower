@@ -28,5 +28,5 @@ public class Teleporter extends GameElement {
     public String getPathToImage(){return getPathToImage(skinIndex);}
 
     // Méthode déclenchée lorsqu'une action est effectuée sur le téléporteur
-    public void triggerAction(Model gameBoard) {System.out.println("Tp in other portal");}
+    public void triggerAction(GameBoard gameBoard) {System.out.println("Tp in other portal");}
 }

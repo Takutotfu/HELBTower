@@ -5,9 +5,8 @@ import java.util.Map;
 
 // Classe représentant le Hero
 public class MainCharacter extends Character {
-    private int movementNbr;
     private boolean isAlive = true;
-    private Point memoryPosition;
+    private ArrayList<Point> memoryPosition = new ArrayList<>();
     private Map<String, String> charSkinMap = new HashMap<>();
 
     // Constructeur
@@ -64,11 +63,7 @@ public class MainCharacter extends Character {
                     moveDown();
                     break;
             }
-            movementNbr++;
-            if (movementNbr == Chronometer.getPower()) {
-                setThisPositionInMemory();
-                movementNbr = 0;
-            }
+            setThisPositionInMemory();
         }
     }
 
@@ -89,7 +84,7 @@ public class MainCharacter extends Character {
     }
 
     // Vérifie si le personnage principal est tué par des gardes
-    public void isKillByGuards(ArrayList<Character> charArray) {
+    public void killByGuard(ArrayList<Character> charArray) {
         for (Character character : charArray) {
             if (getX() == character.getX() && 
                 getY() == character.getY() &&
@@ -104,13 +99,16 @@ public class MainCharacter extends Character {
     public boolean isAlive() {return isAlive;}
 
     // Sauvegarde la position actuelle du héro dans sa mémoire
-    public void setThisPositionInMemory() {memoryPosition = new Point(getX(), getY());}
+    public void setThisPositionInMemory() {memoryPosition.add(new Point(getX(), getY()));}
 
     // Récupère la map des chemins des skins du personnage principal
     public Map<String, String> getCharSkinMap() {return charSkinMap;}
 
+    // Efface la mémoire du personnage principal
+    public void clearMemoryPosition() {memoryPosition.clear();}
+
     // Récupère la position mémorisée du personnage principal
-    public Point getMemoryPostion() {return memoryPosition;}
+    public Point getMemoryPostion() {return memoryPosition.get(memoryPosition.size()-Chronometer.getPower());}
 
     // Redéfinition de la méthode setAlive pour réinitialiser l'état du personnage principal
     public void setAlive() {isAlive = true;}

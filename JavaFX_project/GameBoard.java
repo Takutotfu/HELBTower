@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Model {
+public class GameBoard {
     private int period = 0;
 
     private int rows = 0;
@@ -41,7 +41,7 @@ public class Model {
 
     private ArrayList<GameElement> gameElementList = new ArrayList<GameElement>();
 
-    public Model(int rows, int columns, int period, MainCharacter mainChar) {
+    public GameBoard(int rows, int columns, int period, MainCharacter mainChar) {
         // Constructeur
 
         this.rows = rows;
@@ -52,7 +52,7 @@ public class Model {
 
 
     public void generateCloak() {
-        // Génère une cape...
+        // Génère une cape
 
         start:
         while (true) {
@@ -74,7 +74,7 @@ public class Model {
     }
 
     public void generateChronometer() {
-        // Génère un chronomètre...
+        // Génère un chronomètre
 
         start:
         while (true) {
@@ -251,16 +251,7 @@ public class Model {
             if (gameElem.getPosX() == mainChar.getX() && gameElem.getPosY() == mainChar.getY()) {
                 gameElem.triggerAction(this);
 
-                if (gameElem instanceof Potion) { // Drink Potion
-                    triggerPotion(gameElem);
-
-                } else if (gameElem instanceof Cloak) { // Take Cloak
-                    triggerCloak(gameElem);
-
-                } else if (gameElem instanceof Chronometer) { // Take Chronometer
-                    triggerChronometer(gameElem);
-
-                } else if (gameElem instanceof Coin && isPurpleGuardAlive) { // Take Coin
+                if (gameElem instanceof Coin && isPurpleGuardAlive) { // Take Coin
                     purpleDelay--;
                 } else if (gameElem instanceof Wall) { // Passed through a Wall
                     isWearingCloak = false;
@@ -280,10 +271,8 @@ public class Model {
         triggerPortal(); // Take a portal
     }
 
-    private void triggerPotion(GameElement gameElem) {
+    public void triggerPotion(Potion potion) {
         // Traitement de l'interaction avec une potion
-
-        Potion potion = (Potion) gameElem;
         lastTimePotionTaked = System.currentTimeMillis();
 
         if (potion.isTaked()) {
@@ -293,24 +282,20 @@ public class Model {
         }
     }
 
-    private void triggerCloak(GameElement gameElem) {
+    public void triggerCloak(Cloak cloak) {
         // Traitement de l'interaction avec une cape
-
-        Cloak cloak = (Cloak) gameElem;
-
         if (cloak.isTaked()) {
             isWearingCloak = true;
         }
         cloak.unsetTaked();
     }
 
-    private void triggerChronometer(GameElement gameElem) {
+    public void triggerChronometer(Chronometer chronometer) {
         // Traitement de l'interaction avec un chronometre
-
-        Chronometer chronometer = (Chronometer) gameElem;
         Point postion = mainChar.getMemoryPostion();
 
         mainChar.setLocation(postion.getX(), postion.getY());
+        mainChar.clearMemoryPosition();
 
         if (chronometer.isTaked() && !isChronometerEffect) {
             chronometerCooldown = chronometer.getDuration();
@@ -386,7 +371,7 @@ public class Model {
         return false;
     }
 
-    // GET & SET
+    // Getter & Setter
     public int getBestScore() {return bestScore;}
 
     public void setBestScore(int score) {bestScore = score;}

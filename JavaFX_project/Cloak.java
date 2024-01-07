@@ -10,12 +10,14 @@ public class Cloak extends GameElement {
 
     // Déclenche l'action associée à la cape
     @Override
-    public void triggerAction(Model gameBoard) {
+    public void triggerAction(GameBoard gameBoard) {
         // Marque la cape comme prise
         isTaked = true;
         // Déplace la cape vers une position vide sur le plateau
         setPosX(gameBoard.getVoidX());
         setPosY(gameBoard.getVoidY());
+
+        gameBoard.triggerCloak(this);
     }
 
     // Vérifie si la cape a été prise

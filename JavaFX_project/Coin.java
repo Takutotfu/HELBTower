@@ -7,7 +7,7 @@ public class Coin extends GameElement {
     
     // Déclenche l'action associée à la pièce
     @Override
-    public void triggerAction(Model gameBoard) {
+    public void triggerAction(GameBoard gameBoard) {
         // Diminue le compteur de pièces du plateau
         gameBoard.decreaseCoinCounter();
         

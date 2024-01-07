@@ -8,6 +8,6 @@ public class Wall extends GameElement {
 
     // Méthode déclenchée lorsqu'une action est effectuée sur le mur (ne fait rien dans ce cas)
     @Override
-    public void triggerAction(Model gameBoard) {}
+    public void triggerAction(GameBoard gameBoard) {}
 
 }

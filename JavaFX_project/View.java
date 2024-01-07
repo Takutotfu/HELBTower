@@ -8,7 +8,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 // Classe responsable de l'affichage dans le jeu
-public class HelbTowerView {
+public class View {
     private int width, height, rows, columns, squareSize;
 
     private static final String GRASS_MORNING_PATH = "/img/grassMorning.png";
@@ -25,7 +25,7 @@ public class HelbTowerView {
     private Map<String, Image> imageCache = new HashMap<>();  // Cache des images pour optimiser la mémoire (éviter les crash)
 
     // Constructeur
-    public HelbTowerView(int width, int height, int rows, int columns, int squareSize) {
+    public View(int width, int height, int rows, int columns, int squareSize) {
         this.width = width;
         this.height = height;
         this.rows = rows;
