@@ -15,10 +15,8 @@
 1. 🏢 [Introduction](#introduction)
 2. 🎮 [Game Description](#game-description)
 3. 🔋 [Additional Feature](#features)
-4. 🤸 [Quick Start](#quick-start)
-5. 🕸️ [Code to Copy](#snippets)
-6. 🔗 [Assets](#links)
-7. 🚀 [More](#more)
+4. 🧠 [Conclusion](#conclusion)
+5. 🖥️ [Installation](#installation)
 
 ## <a name="introduction">🏢 Introduction</a>
 
@@ -98,6 +96,34 @@ The **Chronometer** is an additional feature inspired by the <a href='https://fr
 - **Activation**: Press `S` to enable the feature, which generates hourglasses on the game board.
 - **Effect**: Collecting an hourglass moves the player back a few squares and temporarily slows down the guardians. After the effect duration, the guardians' speed returns to normal.
 
-## Conclusion
+## <a name="conclusion">🧠 Conclusion</a>
 
 The HELBTower project is an opportunity to apply advanced Java and game development concepts. By following the guidelines and adhering to the constraints, you will develop an engaging game while demonstrating your skills in object-oriented programming. Good luck with your development journey, and may your hero triumph over the darkness!
+
+## <a name="installation">🖥️ Installation</a>
+
+Download the main archive and unzip the `JavaFX_project`.
+<div align='center'>  
+  <img src='https://takutotofu.s-ul.eu/6KBV7CAL' alt='tuto1' />
+</div>
+
+### 🪟 For Windows
+
+You need to download <a href='https://gluonhq.com/products/javafx/'><b>JavaFX library</b></a>, extract the folder into `C:\Program Files\Java` (create folder if needed) and
+edit `run.bat` file to set the path of your JavaFX lib folder :
+
+<div align='center'>
+  <img src='https://takutotofu.s-ul.eu/raI7vuL0' alt='tuto2' />
+</div>
+
+### 🐧 For Linux
+
+You need to run this command :
+
+```bash
+sudo apt-get install openjfx
+````
+
+or download it on this <a href='https://gluonhq.com/products/javafx/'><b>site</b></a> and extract it into `${JAVA_HOME}/lib/`.
+
+So use the `run.bash` instead.
